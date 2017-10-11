@@ -4,9 +4,7 @@ from subprocess import call
 from path import *
 from updateparams import *
 
-def run ():
-	# Load cosmological parameters
-	params_list = np.loadtxt (params_input)[0:,]
+def run (params_list, tag):
 		
 	# Run CLASS (syncronous gauge)
 	os.chdir(path_CLASS_syn)
@@ -49,10 +47,17 @@ def run ():
 	os.system ("python c_z.py {0} {1} {2}".format (outfile_syn, outfile_HYREC, "transfer21.txt"))
 	os.system ("cp transfer21.txt {0}".format (outfile_21))
 	os.system ("rm transfer21.txt")
-
+	
 	# Calculate C_l^{21,ISW}
-	outfile_cl21 = path_result + "/cl21T.txt"
-	os.system ("python cl_21.py {0} {1} {2} {3}".format (outfile_syn, outfile_new, outfile_21, outfile_cl21)
-	)
-run ()
+	os.chdir(path_HYREC)
+	outfile_syn = path_data + "/delta_syn.dat"
+	outfile_new = path_data + "/delta_new.dat"
+	outfile_21 = path_data + "/transfer21.txt"
+	outfile_cl21 = path_result + "/cl21T_{}.txt".format (tag)
+	os.system ("python run_cl21.py {0} {1} {2} {3}".format (outfile_syn, outfile_new, outfile_21, outfile_cl21))
+
+# Load cosmological parameters
+params_list = np.loadtxt (params_input)[0:,]
+tag = "baryon"
+run (params_list, tag)
 
