@@ -48,6 +48,7 @@ def run ():
 	outfile_21 = path_data + "/transfer21.txt"
 	os.system ("python c_z.py {0} {1} {2}".format (outfile_syn, outfile_HYREC, "transfer21.txt"))
 	os.system ("cp transfer21.txt {0}".format (outfile_21))
+	os.system ("rm transfer21.txt")
 
 	# Calculate C_l^{21,ISW}
 	outfile_cl21 = path_result + "/cl21T.txt"
