@@ -1,0 +1,12 @@
+h
+Omega_b
+Omega_cdm
+Omega_Lambda
+tau_reio
+ln10^{10}A_s
+n_s
+N_ur
+N_ncdm
+m_ncdm
+T_ncdm
+
