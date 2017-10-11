@@ -3,7 +3,6 @@ import os
 from subprocess import call
 from path import *
 from updateparams import *
-
 def run (params_list, tag):
 		
 	# Run CLASS (syncronous gauge)
