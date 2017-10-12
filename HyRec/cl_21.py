@@ -4,17 +4,7 @@ from scipy.integrate import simps
 import selection_function21cm as sf
 import matplotlib.pyplot as plt
 import scipy.special
-#import data_no_nu as data
-import data
 import sys
-
-#infile_syn = sys.argv[1]
-#infile_new = sys.argv[2]
-#infile_21 = sys.argv[3]
-#outfile = sys.argv[4]
-
-z_m_list = [30, 50,75,100,125,150,175,200]
-w_list = [3.31685, 2.47355 ,1.93014, 1.60434, 1.38246, 1.21989, 1.09467, 1]
 
 class cl_21 (object):
 	def __init__ (self, infile_syn, infile_new, infile_21):
@@ -69,13 +59,12 @@ class cl_21 (object):
 		#self.baryon = np.loadtxt(self.infile_21)[0:,5]
 		
 
-		l = 100000
-		l_list = np.arange(2, l+1)
 		l_list = np.logspace(np.log10(2), np.log10(5000), 1000)
+		l_list = np.logspace(np.log10(2), np.log10(100), 100)
 		for i in range(len(l_list)):
 			l_list[i] = int(l_list[i])
 		l_list = sorted(set(l_list))
-		l_list[-1] += 1
+		#l_list[-1] += 1
 		l_list = np.array (l_list)
 
 		self.hubble_class = hubble_class
@@ -107,13 +96,12 @@ class cl_21 (object):
 			T_baryon.append (bb)
 		T_dphidz = interp2d (self.zlist2, self.klist2, T_dphidz[::-1], kind = 'quintic')
 		T_baryon = interp2d (self.zlist2, self.klist2, T_baryon[::-1], kind = 'quintic')
-
+		"""
 		delta_21 =[]
 		distortion = []
 		for i in range(self.number_of_k):
 			#bb = self.baryon[self.number_of_z*i:self.number_of_z*(i+1)][::-1]
 	
-			#d = T21[number_of_z*i:number_of_z*(i+1)][::-1]
 			d = self.T21[self.number_of_z*(self.number_of_k-1):self.number_of_z*self.number_of_k][::-1]
 			#d = d*bb
 			delta_21.append (d)
@@ -122,7 +110,10 @@ class cl_21 (object):
 			distortion.append (d)
 		delta_21 = interp2d (self.zlist, self.klist, delta_21[::-1], kind = 'quintic')
 		distortion = interp2d (self.zlist, self.klist, distortion[::-1], kind = 'quintic')
-		
+		"""
+
+		delta_21 = self.T21[0:self.number_of_z][::-1]
+
 		cl_list = []
 		for l in self.l_list:
 			print (l)
@@ -132,7 +123,8 @@ class cl_21 (object):
 			transfer_21 = []
 			transfer_dphidz = []
 			for j in range(len(kk)):
-				T = delta_21 (z[j], kk[j])[0]
+				#T = delta_21 (z[j], kk[j])[0]
+				T = np.interp (z[j], self.zlist, delta_21)
 				bb = T_baryon (z[j], kk[j])[0]
 				transfer_21.append (T*bb)
 				p = T_dphidz (z[j], kk[j])[0]
