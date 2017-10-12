@@ -81,7 +81,7 @@ T_b = np.interp(zz[::-1], test_z[::-1], test_T_b[::-1])[::-1]
 #plt.plot(test.z+1, test.T_b*1000, label = r'$\bar{T}_{\mathrm{b}}$')
 	
 kkkk = np.arange(59)*10
-for i in range(number_of_k):#[20, 28, 184, 443, 551, 584,594]:#range(20,number_of_k):
+for i in [number_of_k-1]:#range(number_of_k):#[20, 28, 184, 443, 551, 584,594]:#range(20,number_of_k):
 	kk = rev_klist[i]
 	print (i, kk)
 	b = delta_b[i*number_of_z:(i+1)*number_of_z]
