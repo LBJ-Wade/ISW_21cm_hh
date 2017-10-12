@@ -123,6 +123,6 @@ def test_run (infile_syn, infile_HYREC):
 	plt.axis([20,200,-130,140])
 	fig.set_xticks([20,30,50,70,100,150,200])
 	fig.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-	plt.savefig ('Tb_coeffi.pdf', format='pdf')
+	#plt.savefig ('Tb_coeffi.pdf', format='pdf')
 
 	return z, T_T, T_H, T_b
