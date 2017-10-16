@@ -59,7 +59,7 @@ def run (params_list, tag):
 	os.system ("python run_cl21.py {0} {1} {2} {3}".format (outfile_syn, outfile_new, outfile_21, outfile_cl21))
 
 # Load cosmological parameters
-#params_list = np.loadtxt (params_input)[0:,]
-#tag = "baryon"
-#run (params_list, tag)
+params_list = np.loadtxt (params_input)[0:,]
+tag = "baryon"
+run (params_list, tag)
 
