@@ -3,8 +3,10 @@ import os
 from subprocess import call
 from path import *
 from updateparams import *
+
 def run (params_list, tag):
 		
+	'''
 	# Run CLASS (syncronous gauge)
 	os.chdir (path_CLASS_syn)
 	oldfile = "params_prac_.ini"
@@ -35,8 +37,8 @@ def run (params_list, tag):
 	os.chdir ("../")
 	os.chdir ("../")
 	
-	# Run HYREC	
 	os.chdir (path_HYREC)
+	# Run HYREC	
 	oldfile = "input_prac.dat"
 	newfile = "input_prac2.dat"
 	outfile_HYREC = "output_prac.dat"
@@ -55,8 +57,15 @@ def run (params_list, tag):
 	outfile_syn = path_data + "/delta_syn.dat"
 	outfile_new = path_data + "/delta_new.dat"
 	outfile_21 = path_data + "/transfer21.txt"
+	'''
+	os.chdir (path_HYREC)
+	outfile_syn = path_data + "/delta_syn.dat"
+	outfile_new = path_data + "/delta_new.dat"
+	outfile_HYREC = "output_prac.dat"
 	outfile_cl21 = path_result + "/cl21T_{}.txt".format (tag)
-	os.system ("python run_cl21.py {0} {1} {2} {3}".format (outfile_syn, outfile_new, outfile_21, outfile_cl21))
+	
+	#os.system ("python run_cl21.py {0} {1} {2} {3}".format (outfile_syn, outfile_new, outfile_21, outfile_cl21))
+	os.system ("python run_cl21_2.py {0} {1} {2} {3} {4}".format (outfile_syn, outfile_new, outfile_HYREC, outfile_cl21, params_input))
 
 # Load cosmological parameters
 params_list = np.loadtxt (params_input)[0:,]
