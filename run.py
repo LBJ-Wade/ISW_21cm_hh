@@ -45,27 +45,23 @@ def run (params_list, tag):
 	setparamsfile_HYREC (params_list, oldfile, newfile)
 	os.system ("gcc -lm -O3 hyrectools.c helium.c hydrogen.c history.c hyrec.c -o hyrec")
 	call ("./hyrec < {0} > {1}".format (newfile, outfile_HYREC), shell = True)	
-	
+	os.chdir ("../")
+	'''
+	'''	
 	# Calculate 21cm fluctuation coefficients
 	outfile_21 = path_data + "/transfer21.txt"
 	os.system ("python c_z.py {0} {1} {2}".format (outfile_syn, outfile_HYREC, "transfer21.txt"))
 	os.system ("cp transfer21.txt {0}".format (outfile_21))
 	os.system ("rm transfer21.txt")
-	
-	# Calculate C_l^{21,ISW}
-	os.chdir (path_HYREC)
-	outfile_syn = path_data + "/delta_syn.dat"
-	outfile_new = path_data + "/delta_new.dat"
-	outfile_21 = path_data + "/transfer21.txt"
 	'''
-	os.chdir (path_HYREC)
+	# Calculate C_l^{21,ISW}
 	outfile_syn = path_data + "/delta_syn.dat"
 	outfile_new = path_data + "/delta_new.dat"
-	outfile_HYREC = "output_prac.dat"
+	outfile_HYREC = "HYREC/output_prac.dat"
 	outfile_cl21 = path_result + "/cl21T_{}.txt".format (tag)
 	
 	#os.system ("python run_cl21.py {0} {1} {2} {3}".format (outfile_syn, outfile_new, outfile_21, outfile_cl21))
-	os.system ("python run_cl21_2.py {0} {1} {2} {3} {4}".format (outfile_syn, outfile_new, outfile_HYREC, outfile_cl21, params_input))
+	os.system ("python run_cl21.py {0} {1} {2} {3} {4}".format (outfile_syn, outfile_new, outfile_HYREC, outfile_cl21, params_input))
 
 # Load cosmological parameters
 params_list = np.loadtxt (params_input)[0:,]
