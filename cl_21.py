@@ -8,6 +8,8 @@ import sys
 import matplotlib.ticker
 
 def set_cl_21 (tag):		# At the end, it would take z_m_list, w_list as arguments
+	""" Construct object of class cl_21 """
+	
 	infile = 'data/file_names_{0}.txt'.format (tag)
 	file_names = np.genfromtxt(infile, dtype="str")[0:]
 	params_input = file_names[0]
@@ -25,7 +27,6 @@ def set_cl_21 (tag):		# At the end, it would take z_m_list, w_list as arguments
 	
 
 class cl_21 (object):
-	#def __init__ (self, infile_syn, infile_new, infile_HYREC, infile_21):
 	def __init__ (self, params_list, infile_HYREC, infile_syn, infile_new = None):
 
 		self.params_list = params_list
@@ -94,27 +95,6 @@ class cl_21 (object):
 		self.A10 = 2.85*10**-15 / self.c											# /m	
 		self.B10 = self.A10*(1+1/(np.e**(self.E10/self.Tr)-1))							# /m
 		
-		#21 data
-		"""
-		z = np.loadtxt(self.infile_21)[0:,0]
-		print ('z data', len(z))
-		k = np.loadtxt(self.infile_21)[0:,1]
-		print ('k data', len(k))
-		zlist = sorted(set(z))
-		klist = sorted(set(k))
-		number_of_z = len(zlist)
-		number_of_k = len(klist)
-		self.T21 = np.loadtxt(self.infile_21)[0:,2]
-		print ('T21 data', len(self.T21))
-		self.redshift_distortion = np.loadtxt(self.infile_21)[0:,3]
-		print ('redshift distortion', len(self.redshift_distortion))
-		#self.baryon = np.loadtxt(self.infile_21)[0:,5]
-		self.zlist = zlist
-		self.klist = klist
-		self.number_of_z = number_of_z
-		self.number_of_k = number_of_k
-		"""
-
 		l_list = np.logspace(np.log10(2), np.log10(5000), 1000)
 		l_list = np.logspace(np.log10(2), np.log10(10), 2)
 		for i in range(len(l_list)):
@@ -125,7 +105,8 @@ class cl_21 (object):
 
 
 	def test_run (self):
-	
+		""" Calculate coefficients of 21 cm fluctuations (linear terms) """
+
 		zlist = self.zlist2.copy ()
 		hubble_class = self.hubble_class.copy ()
 	
@@ -165,6 +146,7 @@ class cl_21 (object):
 		return z, T_T, T_H, T_b
 
 	def c_z (self):
+		""" Calculate C1(z) which is defiend as T_{Tgas} = C1(z) T_{b} """
 
 		hubble_class = self.hubble_class[::-1].copy ()
 
@@ -230,6 +212,7 @@ class cl_21 (object):
 		
 			
 	def cl21T (self, z_m, w):
+		""" Calculate cross-correlation functions of ISW and 21 cm """
 
 		z, sel, _ = sf.run_sel (w, z_m)
 		
@@ -290,6 +273,8 @@ class cl_21 (object):
 
 
 	def cl21 (self, z_m, w):
+		""" Calculate 21 cm auto-correlation functions """
+		
 		z = np.linspace(10,400,1000)
 		z1, sel1, _ = sf.run_sel (w[0], z_m[0])
 		z2, sel2, _ = sf.run_sel (w[1], z_m[1])
