@@ -6,9 +6,27 @@ import matplotlib.pyplot as plt
 import scipy.special
 import sys
 import matplotlib.ticker
+
+def set_cl_21 (tag):		# At the end, it would take z_m_list, w_list as arguments
+	infile = 'data/file_names_{0}.txt'.format (tag)
+	file_names = np.genfromtxt(infile, dtype="str")[0:]
+	params_input = file_names[0]
+	infile_syn = file_names[1]
+	infile_new = file_names[2]
+	infile_HYREC = file_names[3]
+	outfile = file_names[4]
+	
+	params_list = np.loadtxt (params_input)[0:,]
+
+	Cl = cl_21 (params_list, infile_HYREC, infile_syn, infile_new)
+	Cl.test_run () 
+	Cl.c_z ()
+	return Cl
+	
+
 class cl_21 (object):
 	#def __init__ (self, infile_syn, infile_new, infile_HYREC, infile_21):
-	def __init__ (self, params_list, infile_syn, infile_new, infile_HYREC):
+	def __init__ (self, params_list, infile_HYREC, infile_syn, infile_new = None):
 
 		self.params_list = params_list
 		self.infile_syn = infile_syn
@@ -98,7 +116,7 @@ class cl_21 (object):
 		"""
 
 		l_list = np.logspace(np.log10(2), np.log10(5000), 1000)
-		l_list = np.logspace(np.log10(2), np.log10(100), 100)
+		l_list = np.logspace(np.log10(2), np.log10(10), 2)
 		for i in range(len(l_list)):
 			l_list[i] = int(l_list[i])
 		l_list = sorted(set(l_list))
@@ -212,8 +230,9 @@ class cl_21 (object):
 		
 			
 	def cl21T (self, z_m, w):
-		z, sel, _ = sf.run_sel (w, z_m)
 
+		z, sel, _ = sf.run_sel (w, z_m)
+		
 		chi_class_local = np.interp (z, self.zlist2, self.chi_class)
 		hubble_local = np.interp (z, self.zlist2, self.hubble_class)
 		dphidz = np.loadtxt(self.infile_new)[0:,5]
@@ -271,10 +290,14 @@ class cl_21 (object):
 
 
 	def cl21 (self, z_m, w):
-		z, sel, _ = sf.run_sel (w, z_m)
+		z = np.linspace(10,400,1000)
+		z1, sel1, _ = sf.run_sel (w[0], z_m[0])
+		z2, sel2, _ = sf.run_sel (w[1], z_m[1])
+		sel1 = np.interp (z, z1, sel1)
+		sel2 = np.interp (z, z2, sel2)
 
-		chi_class_local = np.interp (z, self.redshift2, self.chi_class)
-		hubble_local = np.interp (z, self.redshift2, self.hubble_class)
+		chi_class_local = np.interp (z, self.zlist2, self.chi_class)
+		hubble_local = np.interp (z, self.zlist2, self.hubble_class)
 		
 		T_baryon = []
 		for i in range(self.number_of_k2):
@@ -297,22 +320,23 @@ class cl_21 (object):
 		delta_21 = interp2d (zlist, klist, delta_21[::-1], kind = 'quintic')
 		distortion = interp2d (zlist, klist, distortion[::-1], kind = 'quintic')
 		"""
-		delta_21 = self.T21[0:self.number_of_z][::-1]
-	
+		delta_21 = self.T21[::-1].copy ()
+		zz = self.zz[::-1].copy ()
+
 		cl_list = []
-		for l in l_list:
+		for l in self.l_list:
 			print (l)
 			kk = (l+1/2)/chi_class_local
 			P_phi_local = np.interp (kk, self.k_list, self.P_phi)
 			
 			transfer_21 = []
 			for j in range(len(kk)):
-				T = np.interp (z[j], self.zlist, delta_21)
+				T = np.interp (z[j], zz, delta_21)
 				bb = T_baryon (z[j], kk[j])[0]
 				transfer_21.append (T*bb)
 			transfer_21 = np.array (transfer_21)
 	
-			integrand = 2*np.pi**2/l**3 * kk**3*P_phi_local/(2*np.pi**2) * sel**2 * transfer_21**2 * chi_class_local * hubble_local
+			integrand = 2*np.pi**2/l**3 * kk**3*P_phi_local/(2*np.pi**2) * sel1 * sel2 * transfer_21**2 * chi_class_local * hubble_local
 			cl = simps (integrand, z)
 			cl_list.append (cl)
 	
