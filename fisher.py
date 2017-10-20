@@ -15,6 +15,7 @@ class fisher (object):
 		self.deriv_vec = {}
 		self.cov = {}
 
+		self.l_list = None
 	def cl21T_deriv_vec (self):
 		""" Construct vector of derivative of cl21T w.r.t each parameter"""
 		
@@ -27,7 +28,9 @@ class fisher (object):
 				tag = param + "_{}1".format(i)
 				run (params_list_copy, tag)
 				Cl1 = set_cl_21 (tag)
-				
+				if j == 0:
+					self.l_list = Cl1.l_list
+
 				params_list_copy = self.params_list.copy ()
 				params_list_copy[j] *= (1 + self.stepsize[i])
 				tag = param + "_{}2".format(i)
@@ -69,11 +72,10 @@ class fisher (object):
 		l = np.loadtxt(cl_out)[0:,0]
 		aa = 2.7255**2 * 2*np.pi / (l*(l+1))
 		cl = np.loadtxt(cl_out)[0:,1]*aa
-		self.l_list = Cl.l_list
-		clTT = np.interp (Cl.l_list, l, cl)
+		clTT = np.interp (self.l_list, l, cl)
 		for i in range(len(self.z_m_list)):
 			for j in range(len(self.z_m_list)):
-				element_ij = (cl21["{0}{1}".format(i,j)] * clTT + cl21T["{0}".format(i)]*cl21T["{0}".format(j)]) / (2*Cl.l_list+1)
+				element_ij = (cl21["{0}{1}".format(i,j)] * clTT + cl21T["{0}".format(i)]*cl21T["{0}".format(j)]) / (2*self.l_list+1)
 				self.cov["{0}{1}".format(i,j)] = element_ij
 		
 	def fisher_analysis (self):
@@ -100,11 +102,17 @@ class fisher (object):
 
 	def convergence_test (self):
 		""" Convergence test for the derivative of cl21T """
-	
-		for j in range(len(self.fisher_params)):
-			for i in [1,2]:
-				param = self.fisher_params[j]
+		
+		if len(self.deriv_vec) == 0:
+			print ("ERROR : Do cl21T_deriv_vec (self) first")
+			return None
 
+		deriv_cl_dic = {}
+		for j in range(len(self.fisher_params)):
+			param = self.fisher_params[j]
+			
+			dev_cl = {}
+			for i in [1,2]:
 				params_list_copy = self.params_list.copy ()
 				params_list_copy[j] *= (1 - self.stepsize[i])
 				tag = param + "_{}1".format(i)
@@ -117,16 +125,41 @@ class fisher (object):
 				run (params_list_copy, tag)
 				Cl2 = set_cl_21 (tag)
 				
-				dev_cl = {}
 				for k in range(len(self.z_m_list)):
 					cl1_zm = Cl1.cl21T (self.z_m_list[k], self.w_list[k])
 					cl2_zm = Cl2.cl21T (self.z_m_list[k], self.w_list[k])
 					dev_cl_zm = (cl2_zm-cl1_zm)/(2*self.params_list[j]*self.stepsize[i])
-					dev_cl['{0}'.format (self.z_m_list[k])] = dev_cl_zm
-			self.deriv_vec[param] = dev_cl
+					dev_cl['{0}_{1}'.format (self.z_m_list[k],i)] = dev_cl_zm
+			
+			deriv_cl_dic[param] = dev_cl
+	
+		print (deriv_cl_dic)
+		n = 1
+		for j in range(len(self.fisher_params)):
+			param = self.fisher_params[j]
+			for k in range(len(self.z_m_list)):
+				dcl0 = self.deriv_vec[param]['{0}'.format (self.z_m_list[k])]
+				dcl1 = deriv_cl_dic[param]['{0}_{1}'.format (self.z_m_list[k],1)]
+				dcl2 = deriv_cl_dic[param]['{0}_{1}'.format (self.z_m_list[k],2)]
+				conv_test_b1 = np.log10(abs((dcl0-dcl1)/dcl0))
+				conv_test_b2 = np.log10(abs((dcl0-dcl2)/dcl0))
+				
+				plt.figure(n)
+				plt.plot (self.l_list, conv_test_b1, label = r'stepsize$\times$0.5')
+				plt.plot (self.l_list, conv_test_b2, label = r'stepsize$\times$1.5')
+				plt.savefig (path_result + "/conv/conv_{0}_{1}.pdf".format (param, self.z_m_list[k]))
+				n += 1
+		
+		print ("Convergence test done")
 		return None	
 
-	
+# Convergence Test	
+F = fisher ()
+F.cl21T_deriv_vec ()
+F.convergence_test ()
+
+# Fisher Analysis
+"""
 F = fisher ()
 F.cl21T_deriv_vec ()
 F.cov_matrix ()
@@ -134,3 +167,4 @@ fisher_matrix = F.fisher_analysis ()
 print (fisher_matrix)
 print (inv(fisher_matrix))
 print (np.dot (fisher_matrix, inv(fisher_matrix)))
+"""
