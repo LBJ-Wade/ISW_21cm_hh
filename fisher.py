@@ -4,8 +4,7 @@ from cl_21 import *
 
 class fisher (object): 
 	def __init__ (self):
-		
-		self.n = 2				# Number of window functions
+
 		self.stepsize = [0.01, 0.005, 0.015]
 		self.params_list = np.loadtxt (params_input)[0:,]
 		self.fisher_params = ["h","b"]		# The order of parameters should be the same as in params_list
@@ -16,9 +15,8 @@ class fisher (object):
 		self.deriv_vec = {}
 		self.cov = {}
 
-	def cl21T_vec (self):
-		""" Construct covariance matrix """
-		
+	def cl21T_deriv_vec (self):
+		""" Construct vector of derivative of cl21T w.r.t each parameter"""
 		
 		for j in range(len(self.fisher_params)):
 			for i in [0]:#range(len(self.stepsize)):
@@ -29,16 +27,13 @@ class fisher (object):
 				tag = param + "_{}1".format(i)
 				run (params_list_copy, tag)
 				Cl1 = set_cl_21 (tag)
-				#outfile1 = path_result + "/cl21T_{}.txt".format (tag)
-				#outfile1_list.append (outfile1)
 				
 				params_list_copy = self.params_list.copy ()
 				params_list_copy[j] *= (1 + self.stepsize[i])
 				tag = param + "_{}2".format(i)
 				run (params_list_copy, tag)
 				Cl2 = set_cl_21 (tag)
-				#outfile2 = path_result + "/cl21T_{}.txt".format (tag)
-				#outfile2_list.append (outfile2)
+				
 				dev_cl = {}
 				for k in range(len(self.z_m_list)):
 					cl1_zm = Cl1.cl21T (self.z_m_list[k], self.w_list[k])
@@ -47,9 +42,8 @@ class fisher (object):
 					dev_cl['{0}'.format (self.z_m_list[k])] = dev_cl_zm
 			self.deriv_vec[param] = dev_cl
 
-
 	def cov_matrix (self):
-		""" Construct derivative of covariance matrix """
+		""" Construct covariance matrix """
 
 		cl21T = {}
 		cl21 = {}
@@ -83,6 +77,8 @@ class fisher (object):
 				self.cov["{0}{1}".format(i,j)] = element_ij
 		
 	def fisher_analysis (self):
+		""" Do fisher analysis with results from deriv_vec (self) and cov_matrix (self) """
+		
 		F = np.zeros([len(self.fisher_params),len(self.fisher_params)])
 		for m in range(len(self.fisher_params)):
 			for n in range(len(self.fisher_params)):
@@ -102,13 +98,37 @@ class fisher (object):
 				F[m,n] = F_mn
 		return F
 
-
 	def convergence_test (self):
+		""" Convergence test for the derivative of cl21T """
+	
+		for j in range(len(self.fisher_params)):
+			for i in [1,2]:
+				param = self.fisher_params[j]
+
+				params_list_copy = self.params_list.copy ()
+				params_list_copy[j] *= (1 - self.stepsize[i])
+				tag = param + "_{}1".format(i)
+				run (params_list_copy, tag)
+				Cl1 = set_cl_21 (tag)
+				
+				params_list_copy = self.params_list.copy ()
+				params_list_copy[j] *= (1 + self.stepsize[i])
+				tag = param + "_{}2".format(i)
+				run (params_list_copy, tag)
+				Cl2 = set_cl_21 (tag)
+				
+				dev_cl = {}
+				for k in range(len(self.z_m_list)):
+					cl1_zm = Cl1.cl21T (self.z_m_list[k], self.w_list[k])
+					cl2_zm = Cl2.cl21T (self.z_m_list[k], self.w_list[k])
+					dev_cl_zm = (cl2_zm-cl1_zm)/(2*self.params_list[j]*self.stepsize[i])
+					dev_cl['{0}'.format (self.z_m_list[k])] = dev_cl_zm
+			self.deriv_vec[param] = dev_cl
 		return None	
 
 	
 F = fisher ()
-F.cl21T_vec ()
+F.cl21T_deriv_vec ()
 F.cov_matrix ()
 fisher_matrix = F.fisher_analysis ()
 print (fisher_matrix)
