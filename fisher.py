@@ -2,7 +2,7 @@ from run import *
 from numpy.linalg import inv
 from cl_21 import *
 
-class prior_cmb (object):
+class prior_cmb (object):		# Need to add cl^dd
 	def __init__ (self):
 		self.stepsize = [0.01, 0.01]
 		self.params_list = np.loadtxt (params_input)[0:,]
