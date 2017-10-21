@@ -4,7 +4,28 @@ from subprocess import call
 from path import *
 from updateparams import *
 
-def run (params_list, tag, cross = True):
+def run_cmb (params_list, tag):
+	os.system ("rm class_syn/output/*")
+	os.system ("rm class_new/output/*")
+
+	# Run CLASS (syncronous gauge)
+	os.chdir (path_CLASS_syn)
+	oldfile = "params_prac_.ini"
+	newfile = "params_prac2_.ini"
+	clfile = "params_prac_cl.dat"
+	clout = path_data + "/cl_" + tag + ".dat"
+	setparamsfile_CLASS (params_list, oldfile, newfile)
+	call ('./class {0}'.format (newfile), shell = True)	
+	os.chdir ("output")
+	os.system ("cp {0} {1}".format (clfile, clout))
+
+	os.system ("rm *")
+	os.chdir ("../")
+	os.chdir ("../")
+	
+	return clout
+
+def run_21cm (params_list, tag, cross = True):
 	
 	
 	#Delete unnecessary output file in CLASS
