@@ -187,11 +187,12 @@ class fisher (object):
 		""" Construct vector of derivative of cl21T w.r.t each parameter"""
 		
 		for j in range(len(self.fisher_params)):
+			
 			param = self.fisher_params[j]
 			stepsize = self.stepsize[j]
 			params_list_copy = self.params_list.copy ()
 			params_list_copy[j] -= stepsize
-			tag = param + "_{}1".format(i)
+			tag = param + "_01"
 			run_21cm (params_list_copy, tag)
 			Cl1 = set_cl_21 (tag)
 			if j == 0:
@@ -199,7 +200,7 @@ class fisher (object):
 
 			params_list_copy = self.params_list.copy ()
 			params_list_copy[j] += stepsize 
-			tag = param + "_{}2".format(i)
+			tag = param + "_02"
 			run_21cm (params_list_copy, tag)
 			Cl2 = set_cl_21 (tag)
 			
