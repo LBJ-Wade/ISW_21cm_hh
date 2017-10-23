@@ -356,6 +356,16 @@ F = prior_cmb ()
 F.cmb_deriv_vec ()
 F.cov_matrix ()
 fisher_matrix = F.cmb_fisher_analysis ()
-print (fisher_matrix)
-print (inv(fisher_matrix))
-print (np.dot (fisher_matrix, inv(fisher_matrix)))
+#print (fisher_matrix)
+#print (inv(fisher_matrix))
+#print (np.dot (fisher_matrix, inv(fisher_matrix)))
+
+sigma = []
+for i in range(len(fisher_matrix)):
+	sigma.append (inv(fisher_matrix)[i,i])
+sigma = np.array(sigma)
+data = np.column_stack((sigma))
+
+np.savetxt('sigma.txt', data, fmt = '%1.6e')
+
+
