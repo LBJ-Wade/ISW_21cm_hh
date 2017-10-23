@@ -208,7 +208,7 @@ class fisher (object):
 			for k in range(len(self.z_m_list)):
 				cl1_zm = Cl1.cl21T (self.z_m_list[k], self.w_list[k])
 				cl2_zm = Cl2.cl21T (self.z_m_list[k], self.w_list[k])
-				dev_cl_zm = (cl2_zm-cl1_zm)/(2*self.params_list[j]*self.stepsize[i])
+				dev_cl_zm = (cl2_zm-cl1_zm)/(2*stepsize)
 				dev_cl['{0}'.format (self.z_m_list[k])] = dev_cl_zm
 			self.deriv_vec[param] = dev_cl
 
