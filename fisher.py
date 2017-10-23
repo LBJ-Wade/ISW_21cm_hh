@@ -170,15 +170,16 @@ class prior_cmb (object):		# Need to add cl^dd
 class fisher (object): 
 	def __init__ (self):
 		
-		#self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.1e-9, 0.01, 0.02/3, [0.7117357, 0.721146] ]
-		self.stepsize = [0.0030, 8.0e-4, 5.0e-5]
+		self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.1e-9, 0.01, 0.02/3, [0.7117357, 0.721146] ]
+		#self.stepsize = [0.0030, 8.0e-4, 5.0e-5]
 		self.params_list = np.loadtxt (params_input)[0:,]
 		self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
-		self.fisher_params = ['c','b', 'theta']
+		#self.fisher_params = ['c','b', 'theta']
 		
-		self.z_m_list = [30, 50]
-		self.w_list = [3.31685, 2.47355]
-
+		#self.z_m_list = [30, 50]
+		self.z_m_list = [30, 50,75,100,125,150,175,200]
+		#self.w_list = [3.31685, 2.47355]
+		self.w_list = [3.31685, 2.47355 ,1.93014, 1.60434, 1.38246, 1.21989, 1.09467, 1]
 		self.deriv_vec = {}
 		self.cov = {}
 
@@ -191,7 +192,10 @@ class fisher (object):
 			param = self.fisher_params[j]
 			stepsize = self.stepsize[j]
 			params_list_copy = self.params_list.copy ()
-			params_list_copy[j] -= stepsize
+			if param == 'Neff':
+				params_list_copy[j] = stepsize[0]
+			else:
+				params_list_copy[j] -= stepsize
 			tag = param + "_01"
 			run_21cm (params_list_copy, tag)
 			Cl1 = set_cl_21 (tag)
@@ -199,7 +203,10 @@ class fisher (object):
 				self.l_list = Cl1.l_list
 
 			params_list_copy = self.params_list.copy ()
-			params_list_copy[j] += stepsize 
+			if param == 'Neff':
+				params_list_copy[j] = stepsize[1]
+			else:
+				params_list_copy[j] += stepsize 
 			tag = param + "_02"
 			run_21cm (params_list_copy, tag)
 			Cl2 = set_cl_21 (tag)
@@ -208,7 +215,10 @@ class fisher (object):
 			for k in range(len(self.z_m_list)):
 				cl1_zm = Cl1.cl21T (self.z_m_list[k], self.w_list[k])
 				cl2_zm = Cl2.cl21T (self.z_m_list[k], self.w_list[k])
-				dev_cl_zm = (cl2_zm-cl1_zm)/(2*stepsize)
+				if param == 'Neff':
+					dev_cl_zm = (cl2_zm-cl1_zm)/(2*0.08)
+				else:
+					dev_cl_zm = (cl2_zm-cl1_zm)/(2*stepsize)
 				dev_cl['{0}'.format (self.z_m_list[k])] = dev_cl_zm
 			self.deriv_vec[param] = dev_cl
 
@@ -356,9 +366,9 @@ for i in range(len(fisher_matrix)):
 	sigma.append (inv_fisher[i,i])
 sigma = np.array(sigma)
 data = np.column_stack((sigma))
-np.savetxt('sigma_cl21T.txt', data, fmt = '%1.6e')
+np.savetxt('sigma_cl21Tfull.txt', data, fmt = '%1.6e')
 
-#data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6],fisher_matrix[7]))
-data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2]))
-np.savetxt('fisher_matrix_cl21T.txt', data, fmt = '%1.6e')
+data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6],fisher_matrix[7]))
+#data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2]))
+np.savetxt('fisher_matrix_cl21Tfull.txt', data, fmt = '%1.6e')
 
