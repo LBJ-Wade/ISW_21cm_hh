@@ -380,7 +380,7 @@ fisher_matrix = F.cmb_fisher_analysis ()
 sigma = []
 inv_fisher = inv(fisher_matrix)
 for i in range(len(fisher_matrix)):
-	sigma.append (inv_fisher)[i,i])
+	sigma.append (inv_fisher[i,i])
 sigma = np.array(sigma)
 data = np.column_stack((sigma))
 np.savetxt('sigma.txt', data, fmt = '%1.6e')
