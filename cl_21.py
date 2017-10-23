@@ -19,7 +19,7 @@ def set_cl_21 (tag):		# At the end, it would take z_m_list, w_list as arguments
 	outfile = file_names[4]
 	
 	params_list = np.loadtxt (params_input)[0:,]
-
+	print infile_HYREC
 	Cl = cl_21 (params_list, infile_HYREC, infile_syn, infile_new)
 	Cl.test_run () 
 	Cl.c_z ()
@@ -96,7 +96,7 @@ class cl_21 (object):
 		self.B10 = self.A10*(1+1/(np.e**(self.E10/self.Tr)-1))							# /m
 		
 		l_list = np.logspace(np.log10(2), np.log10(5000), 1000)
-		l_list = np.logspace(np.log10(2), np.log10(10), 2)
+		#l_list = np.logspace(np.log10(2), np.log10(10), 2)
 		for i in range(len(l_list)):
 			l_list[i] = int(l_list[i])
 		l_list = sorted(set(l_list))
