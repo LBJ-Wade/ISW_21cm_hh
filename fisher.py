@@ -4,9 +4,9 @@ from cl_21 import *
 
 class prior_cmb (object):		# Need to add cl^dd
 	def __init__ (self):
-		self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.1e-9, 0.01, 0.02/3,]
+		self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.1e-9, 0.01, 0.02/3, [0.7117357, 0.721146] ]
 		self.params_list = np.loadtxt (params_input)[0:,]
-		self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu']
+		self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
 		self.deriv_vec = {}
 		self.cov = {}
 		self.l_list = None
@@ -18,12 +18,18 @@ class prior_cmb (object):		# Need to add cl^dd
 			stepsize = self.stepsize[j]
 
 			params_list_copy = self.params_list.copy ()
-			params_list_copy[j] -= stepsize 
+			if param == 'Neff':
+				params_list_copy[j] = stepsize[0]
+			else:
+				params_list_copy[j] -= stepsize 
 			tag = param + "1"
 			outfile1 = run_cmb (params_list_copy, tag)
 
 			params_list_copy = self.params_list.copy ()
-			params_list_copy[j] += stepsize 
+			if param == 'Neff':
+				params_list_copy[j] = stepsize[1]
+			else:
+				params_list_copy[j] += stepsize 
 			tag = param + "2"
 			outfile2 = run_cmb (params_list_copy, tag)
 			
