@@ -75,6 +75,7 @@ class prior_cmb (object):		# Need to add cl^dd
 
 	def cov_matrix (self):
 		""" Construct covariance matrix """
+		print ('Start cov_matrix')
 
 		cov = {}
 		tag = "0"
@@ -125,6 +126,7 @@ class prior_cmb (object):		# Need to add cl^dd
 		
 	def cmb_fisher_analysis (self):
 		""" Do fisher analysis with results from deriv_vec (self) and cov_matrix (self) """
+		print ('Start cmb_fisher_analysis')
 			
 		F = np.zeros([len(self.fisher_params),len(self.fisher_params)])
 		for m in range(len(self.fisher_params)):
