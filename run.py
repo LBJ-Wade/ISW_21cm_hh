@@ -101,5 +101,5 @@ def run_21cm (params_list, tag, cross = True):
 # Load cosmological parameters
 #params_list = np.loadtxt (params_input)[0:,]
 #tag = "baryon"
-#run (params_list, tag)
+#run_21cm (params_list, tag)
 #run (params_list, '0')

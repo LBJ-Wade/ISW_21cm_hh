@@ -4,14 +4,15 @@ from cl_21 import *
 
 class prior_cmb (object):		# Need to add cl^dd
 	def __init__ (self):
-		self.stepsize = [0.01, 0.01]
+		self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.1e-9, 0.01, 0.02/3,]
 		self.params_list = np.loadtxt (params_input)[0:,]
-		self.fisher_params = ["h","b"]
+		self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu']
 		self.deriv_vec = {}
 		self.cov = {}
 		self.l_list = None
 	def cmb_deriv_vec (self):
-		
+		print ('Start cmb_deriv_vec')
+
 		for j in range(len(self.fisher_params)):
 			param = self.fisher_params[j]
 			stepsize = self.stepsize[j]
@@ -27,19 +28,35 @@ class prior_cmb (object):		# Need to add cl^dd
 			outfile2 = run_cmb (params_list_copy, tag)
 			
 			dev_cl = {}
-			l = np.loadtxt (outfile1)[0:,0]
-			clTT1 = np.loadtxt (outfile1)[0:,1] / (l*(l+1)/(2*np.pi)) 
-			clTT2 = np.loadtxt (outfile2)[0:,1] / (l*(l+1)/(2*np.pi)) 
-			clTE1 = np.loadtxt (outfile1)[0:,3] / (l*(l+1)/(2*np.pi)) 
-			clTE2 = np.loadtxt (outfile2)[0:,3] / (l*(l+1)/(2*np.pi)) 
-			clEE1 = np.loadtxt (outfile1)[0:,2] / (l*(l+1)/(2*np.pi)) 
-			clEE2 = np.loadtxt (outfile2)[0:,2] / (l*(l+1)/(2*np.pi)) 
-			dev_clTT = (clTT2-clTT1)/(2*self.params_list[j]*stepsize)
-			dev_clTE = (clTE2-clTE1)/(2*self.params_list[j]*stepsize)
-			dev_clEE = (clEE2-clEE1)/(2*self.params_list[j]*stepsize)
+			l = np.loadtxt (outfile1)[28:,0]
+			clTT1 = np.loadtxt (outfile1)[28:,1] / (l*(l+1)/(2*np.pi)) 
+			clTT1[2970:] = 0
+			clTT2 = np.loadtxt (outfile2)[28:,1] / (l*(l+1)/(2*np.pi)) 
+			clTT2[2970:] = 0
+			clTE1 = np.loadtxt (outfile1)[28:,4] / (l*(l+1)/(2*np.pi)) 
+			clTE2 = np.loadtxt (outfile2)[28:,4] / (l*(l+1)/(2*np.pi)) 
+			clEE1 = np.loadtxt (outfile1)[28:,2] / (l*(l+1)/(2*np.pi)) 
+			clEE2 = np.loadtxt (outfile2)[28:,2] / (l*(l+1)/(2*np.pi)) 
+			cldd1 = np.loadtxt (outfile1)[28:,5] / (l*(l+1)/(2*np.pi))
+			cldd2 = np.loadtxt (outfile2)[28:,5] / (l*(l+1)/(2*np.pi))
+			#clTd1 = np.loadtxt (outfile1)[28:,6] / (l*(l+1)/(2*np.pi))
+			#clTd2 = np.loadtxt (outfile2)[28:,6] / (l*(l+1)/(2*np.pi))
+			#clEd1 = np.loadtxt (outfile1)[28:,7] / (l*(l+1)/(2*np.pi))
+			#clEd2 = np.loadtxt (outfile2)[28:,7] / (l*(l+1)/(2*np.pi))
+			
+			
+			dev_clTT = (clTT2-clTT1)/(2*stepsize)
+			dev_clTE = (clTE2-clTE1)/(2*stepsize)
+			dev_clEE = (clEE2-clEE1)/(2*stepsize)
+			dev_cldd = (cldd2-cldd1)/(2*stepsize)
+			#dev_clTd = (clTd2-clTd1)/(2*self.params_list[j]*stepsize)
+			#dev_clEd = (clEd2-clEd1)/(2*self.params_list[j]*stepsize)
 			dev_cl['TT'] = dev_clTT
 			dev_cl['TE'] = dev_clTE
 			dev_cl['EE'] = dev_clEE
+			dev_cl['dd'] = dev_cldd
+			#dev_cl['Td'] = dev_clTd
+			#dev_cl['Ed'] = dev_clEd
 			self.deriv_vec[param] = dev_cl
 
 	def cov_matrix (self):
@@ -48,22 +65,47 @@ class prior_cmb (object):		# Need to add cl^dd
 		cov = {}
 		tag = "0"
 		outfile = run_cmb (self.params_list, tag)
-		l = np.loadtxt (outfile)[0:,0]
+		l = np.loadtxt (outfile)[28:,0]
 		self.l_list = l
-		clTT = np.loadtxt (outfile)[0:,1] / (l*(l+1)/(2*np.pi)) 
-		clTE = np.loadtxt (outfile)[0:,3] / (l*(l+1)/(2*np.pi)) 
-		clEE = np.loadtxt (outfile)[0:,2] / (l*(l+1)/(2*np.pi)) 
+		clTT = np.loadtxt (outfile)[28:,1] / (l*(l+1)/(2*np.pi)) 
+		#clTT[2970:] = 0
+		clTE = np.loadtxt (outfile)[28:,4] / (l*(l+1)/(2*np.pi)) 
+		clEE = np.loadtxt (outfile)[28:,2] / (l*(l+1)/(2*np.pi)) 
+		cldd = np.loadtxt (outfile)[28:,5] / (l*(l+1)/(2*np.pi))
+		clTd = np.loadtxt (outfile)[28:,6] / (l*(l+1)/(2*np.pi))
+		clEd = np.loadtxt (outfile)[28:,7] / (l*(l+1)/(2*np.pi))
+		
 		cov['11'] = 2 * clTT**2 / (2*l+1)
-		
-		cov['12'] = 2 * clTT*clTE / (2*l+1)
-		cov['21'] = 2 * clTT*clTE / (2*l+1)
-		cov['13'] = 2 * clTE**2	/ (2*l+1)
-		cov['31'] = 2 * clTE**2	/ (2*l+1)
 		cov['22'] = (clTT*clEE + clTE**2) / (2*l+1)
-		cov['23'] = 2 * clTE*clEE / (2*l+1)
-		cov['32'] = 2 * clTE*clEE / (2*l+1)
 		cov['33'] = 2 * clEE**2 / (2*l+1)
+		#cov['44'] = (clTT*cldd + clTd**2) / (2*l+1)
+		#cov['55'] = (clEE*cldd + clEd**2) / (2*l+1)
+		#cov['66'] = 2 * cldd**2 / (2*l+1)
+		cov['44'] = 2 * cldd**2 / (2*l+1)
+
+		cov['12'] = 2 * clTT*clTE / (2*l+1); cov['21'] = 2 * clTT*clTE / (2*l+1)
+		cov['13'] = 2 * clTE**2	/ (2*l+1); cov['31'] = 2 * clTE**2	/ (2*l+1)
+		#cov['14'] = 2 * clTT*clTd / (2*l+1); cov['41'] = 2 * clTT*clTd / (2*l+1)	
+		#cov['15'] = 2 * clTE*clTd / (2*l+1); cov['51'] = 2 * clTE*clTd / (2*l+1)	
+		#cov['16'] = 2 * clTd**2 / (2*l+1); cov['61'] = 2 * clTd**2 / (2*l+1)
+		cov['14'] = 2 * clTd**2 / (2*l+1); cov['41'] = 2 * clTd**2 / (2*l+1)
 		
+		cov['23'] = 2 * clTE*clEE / (2*l+1); cov['32'] = 2 * clTE*clEE / (2*l+1)
+		#cov['24'] = (clTT*clEd + clTd*clTE) / (2*l+1); cov['42'] = (clTT*clEd + clTd*clTE) / (2*l+1)
+		#cov['25'] = (clTE*clEd + clTd*clEE) / (2*l+1); cov['52'] = (clTE*clEd + clTd*clEE) / (2*l+1)
+		#cov['26'] = 2 * clTd*clEd / (2*l+1); cov['62'] = 2 * clTd*clEd / (2*l+1)
+		cov['24'] = 2 * clTd*clEd / (2*l+1); cov['42'] = 2 * clTd*clEd / (2*l+1)
+		
+		#cov['34'] = 2 * clTE*clEd / (2*l+1); cov['43'] = 2 * clTE*clEd / (2*l+1)
+		#cov['35'] = 2 * clEE*clEd / (2*l+1); cov['53'] = 2 * clEE*clEd / (2*l+1)
+		#cov['36'] = 2 * clEd**2 / (2*l+1); cov['63'] = 2 * clEd**2 / (2*l+1)
+		cov['34'] = 2 * clEd**2 / (2*l+1); cov['43'] = 2 * clEd**2 / (2*l+1)
+	
+		#cov['45'] = (clTE*cldd + clTd*clEd) / (2*l+1); cov['54'] = (clTE*cldd + clTd*clEd) / (2*l+1)
+		#cov['46'] = 2 * clTd*cldd / (2*l+1); cov['64'] = 2 * clTd*cldd / (2*l+1)
+
+		#cov['56'] = 2 * clEd*cldd / (2*l+1); cov['65'] = 2 * clEd*cldd / (2*l+1)
+
 		self.cov = cov
 		
 	def cmb_fisher_analysis (self):
@@ -75,27 +117,60 @@ class prior_cmb (object):		# Need to add cl^dd
 				F_mn = 0
 				param_m = self.fisher_params[m]
 				param_n = self.fisher_params[n]
-				vec_m = np.zeros(3)
-				vec_n = np.zeros(3)
-				inv_cov = np.zeros([3,3])
+				vec_m = np.zeros(4)
+				vec_n = np.zeros(4)
+				inv_cov = np.zeros([4,4])
 					
-				for l in range(len(self.l_list)):
-					for i in range(3):
-						for j in range(3):
+				#for l in range(len(self.l_list)):
+				for l in range(2971):
+					for i in range(4):
+						for j in range(4):
 							if i == 0:
 								vec_m[i] = self.deriv_vec[param_m]["TT"][l]
 							elif i == 1:
 								vec_m[i] = self.deriv_vec[param_m]["TE"][l]
 							elif i == 2:
 								vec_m[i] = self.deriv_vec[param_m]["EE"][l]
+							elif i == 3:
+								vec_m[i] = self.deriv_vec[param_m]["dd"][l]
+							#elif i == 4:
+							#	vec_m[i] = self.deriv_vec[param_m]["Ed"][l]
+							#elif i == 5:
+							#	vec_m[i] = self.deriv_vec[param_m]["dd"][l]
+							
 							if j == 0:
 								vec_n[j] = self.deriv_vec[param_n]["TT"][l]
 							elif j == 1:
 								vec_n[j] = self.deriv_vec[param_n]["TE"][l]
 							elif j == 2:
 								vec_n[j] = self.deriv_vec[param_n]["EE"][l]
+							elif j == 3:
+								vec_n[j] = self.deriv_vec[param_n]["dd"][l]
+							#elif j == 4:
+							#	vec_n[j] = self.deriv_vec[param_n]["Ed"][l]
+							#elif j == 5:
+							#	vec_n[j] = self.deriv_vec[param_n]["dd"][l]
 							
 							inv_cov[i,j] = 1 / self.cov["{0}{1}".format(i+1,j+1)][l]
+							F_mn += vec_m[i]*inv_cov[i,j]*vec_n[j]
+				for l in range(2971,len(self.l_list)):
+					for i in range(3):
+						for j in range(3):
+							if i == 0:
+								vec_m[i] = self.deriv_vec[param_m]["TE"][l]
+							elif i == 1:
+								vec_m[i] = self.deriv_vec[param_m]["EE"][l]
+							elif i == 2:
+								vec_m[i] = self.deriv_vec[param_m]["dd"][l]
+							
+							if j == 0:
+								vec_n[j] = self.deriv_vec[param_n]["TE"][l]
+							elif j == 1:
+								vec_n[j] = self.deriv_vec[param_n]["EE"][l]
+							elif j == 2:
+								vec_n[j] = self.deriv_vec[param_n]["dd"][l]
+				
+							inv_cov[i,j] = 1 / self.cov["{0}{1}".format(i+2,j+2)][l]
 							F_mn += vec_m[i]*inv_cov[i,j]*vec_n[j]
 				F[m,n] = F_mn
 		return F
