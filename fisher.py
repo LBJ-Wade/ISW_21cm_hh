@@ -128,12 +128,12 @@ class prior_cmb (object):		# Need to add cl^dd
 				F_mn = 0
 				param_m = self.fisher_params[m]
 				param_n = self.fisher_params[n]
-				vec_m = np.zeros(4)
-				vec_n = np.zeros(4)
-				inv_cov = np.zeros([4,4])
 					
 				#for l in range(len(self.l_list)):
 				for l in range(2971):
+					vec_m = np.zeros(4)
+					vec_n = np.zeros(4)
+					inv_cov = np.zeros([4,4])
 					for i in range(4):
 						for j in range(4):
 							if i == 0:
@@ -161,10 +161,16 @@ class prior_cmb (object):		# Need to add cl^dd
 							#	vec_n[j] = self.deriv_vec[param_n]["Ed"][l]
 							#elif j == 5:
 							#	vec_n[j] = self.deriv_vec[param_n]["dd"][l]
-							
-							inv_cov[i,j] = 1 / self.cov["{0}{1}".format(i+1,j+1)][l]
-							F_mn += vec_m[i]*inv_cov[i,j]*vec_n[j]
+							inv_cov[k,j] = self.cov["{0}{1}".format(i+1,j+1)][l]
+					inv_cov = inv(inv_cov)
+					F_mn += np.dot(vec_m, np.dot(inv_cov, vec_n))
+							#inv_cov[i,j] = 1 / self.cov["{0}{1}".format(i+1,j+1)][l]
+							#F_mn += vec_m[i]*inv_cov[i,j]*vec_n[j]
 				for l in range(2971,len(self.l_list)):
+					vec_m = np.zeros(3)
+					vec_n = np.zeros(3)
+					inv_cov = np.zeros([3,3])
+					
 					for i in range(3):
 						for j in range(3):
 							if i == 0:
@@ -181,8 +187,9 @@ class prior_cmb (object):		# Need to add cl^dd
 							elif j == 2:
 								vec_n[j] = self.deriv_vec[param_n]["dd"][l]
 				
-							inv_cov[i,j] = 1 / self.cov["{0}{1}".format(i+2,j+2)][l]
-							F_mn += vec_m[i]*inv_cov[i,j]*vec_n[j]
+							inv_cov[i,j] = self.cov["{0}{1}".format(i+2,j+2)][l]
+					inv_cov = inv(inv_cov)
+					F_mn += vec_m[i]*inv_cov[i,j]*vec_n[j]
 				F[m,n] = F_mn
 		return F
 
