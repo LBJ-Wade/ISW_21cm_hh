@@ -17,6 +17,7 @@ class prior_cmb (object):		# Need to add cl^dd
 			param = self.fisher_params[j]
 			stepsize = self.stepsize[j]
 
+			"""
 			params_list_copy = self.params_list.copy ()
 			if param == 'Neff':
 				params_list_copy[j] = stepsize[0]
@@ -32,7 +33,9 @@ class prior_cmb (object):		# Need to add cl^dd
 				params_list_copy[j] += stepsize 
 			tag = param + "2"
 			outfile2 = run_cmb (params_list_copy, tag)
-			
+			"""
+			outfile1 = path_data + "/cl_" + param+"1" + ".dat"
+			outfile2 = path_data + "/cl_" + param+"2" + ".dat"
 			dev_cl = {}
 			l = np.loadtxt (outfile1)[28:,0]
 			clTT1 = np.loadtxt (outfile1)[28:,1] / (l*(l+1)/(2*np.pi)) 
@@ -75,7 +78,8 @@ class prior_cmb (object):		# Need to add cl^dd
 
 		cov = {}
 		tag = "0"
-		outfile = run_cmb (self.params_list, tag)
+		#outfile = run_cmb (self.params_list, tag)
+		outfile = path_data + "/cl_" + tag + ".dat"
 		l = np.loadtxt (outfile)[28:,0]
 		self.l_list = l
 		clTT = np.loadtxt (outfile)[28:,1] / (l*(l+1)/(2*np.pi)) 
@@ -121,7 +125,7 @@ class prior_cmb (object):		# Need to add cl^dd
 		
 	def cmb_fisher_analysis (self):
 		""" Do fisher analysis with results from deriv_vec (self) and cov_matrix (self) """
-		
+			
 		F = np.zeros([len(self.fisher_params),len(self.fisher_params)])
 		for m in range(len(self.fisher_params)):
 			for n in range(len(self.fisher_params)):
@@ -161,7 +165,7 @@ class prior_cmb (object):		# Need to add cl^dd
 							#	vec_n[j] = self.deriv_vec[param_n]["Ed"][l]
 							#elif j == 5:
 							#	vec_n[j] = self.deriv_vec[param_n]["dd"][l]
-							inv_cov[k,j] = self.cov["{0}{1}".format(i+1,j+1)][l]
+							inv_cov[i,j] = self.cov["{0}{1}".format(i+1,j+1)][l]
 					inv_cov = inv(inv_cov)
 					F_mn += np.dot(vec_m, np.dot(inv_cov, vec_n))
 							#inv_cov[i,j] = 1 / self.cov["{0}{1}".format(i+1,j+1)][l]
