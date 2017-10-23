@@ -50,11 +50,16 @@ class prior_cmb (object):		# Need to add cl^dd
 			#clEd1 = np.loadtxt (outfile1)[28:,7] / (l*(l+1)/(2*np.pi))
 			#clEd2 = np.loadtxt (outfile2)[28:,7] / (l*(l+1)/(2*np.pi))
 			
-			
-			dev_clTT = (clTT2-clTT1)/(2*stepsize)
-			dev_clTE = (clTE2-clTE1)/(2*stepsize)
-			dev_clEE = (clEE2-clEE1)/(2*stepsize)
-			dev_cldd = (cldd2-cldd1)/(2*stepsize)
+			if param == 'Neff':
+				dev_clTT = (clTT2-clTT1)/(2*0.08)
+				dev_clTE = (clTE2-clTE1)/(2*0.08)
+				dev_clEE = (clEE2-clEE1)/(2*0.08)
+				dev_cldd = (cldd2-cldd1)/(2*0.08)
+			else:	
+				dev_clTT = (clTT2-clTT1)/(2*stepsize)
+				dev_clTE = (clTE2-clTE1)/(2*stepsize)
+				dev_clEE = (clEE2-clEE1)/(2*stepsize)
+				dev_cldd = (cldd2-cldd1)/(2*stepsize)
 			#dev_clTd = (clTd2-clTd1)/(2*self.params_list[j]*stepsize)
 			#dev_clEd = (clEd2-clEd1)/(2*self.params_list[j]*stepsize)
 			dev_cl['TT'] = dev_clTT
