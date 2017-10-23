@@ -86,7 +86,7 @@ def run_21cm (params_list, tag, cross = True):
 	'''
 	
 	# Calculate C_l
-	outfile_HYREC = "HYREC/output_prac.dat"
+	outfile_HYREC = path_HYREC + "/output_prac_{0}.dat".format(tag)
 	if cross == True:
 		outfile_cl21 = path_result + "/cl21T_{}.txt".format (tag)
 		file_names = np.array ([params_input, outfile_syn, outfile_new, outfile_HYREC, outfile_cl21])
