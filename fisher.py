@@ -378,11 +378,14 @@ fisher_matrix = F.cmb_fisher_analysis ()
 #print (np.dot (fisher_matrix, inv(fisher_matrix)))
 
 sigma = []
+inv_fisher = inv(fisher_matrix)
 for i in range(len(fisher_matrix)):
-	sigma.append (inv(fisher_matrix)[i,i])
+	sigma.append (inv_fisher)[i,i])
 sigma = np.array(sigma)
 data = np.column_stack((sigma))
-
 np.savetxt('sigma.txt', data, fmt = '%1.6e')
+
+data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6],fisher_matrix[7]))
+np.savetxt('fisher_matrix.txt', data, fmt = '%1.6e')
 
 
