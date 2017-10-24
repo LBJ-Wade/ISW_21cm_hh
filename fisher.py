@@ -183,7 +183,7 @@ class fisher (object):
 		self.deriv_vec = {}
 		self.cov = {}
 
-		self.l_list = None
+		self.l_list = np.arange(2,5001)
 	def cl21T_deriv_vec (self):
 		""" Construct vector of derivative of cl21T w.r.t each parameter"""
 		
@@ -200,7 +200,7 @@ class fisher (object):
 			run_21cm (params_list_copy, tag)
 			Cl1 = set_cl_21 (tag)
 			if j == 0:
-				self.l_list = Cl1.l_list
+				l_list = Cl1.l_list
 
 			params_list_copy = self.params_list.copy ()
 			if param == 'Neff':
@@ -211,18 +211,20 @@ class fisher (object):
 			run_21cm (params_list_copy, tag)
 			Cl2 = set_cl_21 (tag)
 			
-			'''
+			
 			dev_cl = {}
 			for k in range(len(self.z_m_list)):
 				cl1_zm = Cl1.cl21T (self.z_m_list[k], self.w_list[k])
+				cl1_zm = np.interp (self.l_list, l_list, cl1_zm)
 				cl2_zm = Cl2.cl21T (self.z_m_list[k], self.w_list[k])
+				cl2_zm = np.interp (self.l_list, l_list, cl2_zm)
 				if param == 'Neff':
 					dev_cl_zm = (cl2_zm-cl1_zm)/(2*0.08)
 				else:
 					dev_cl_zm = (cl2_zm-cl1_zm)/(2*stepsize)
 				dev_cl['{0}'.format (self.z_m_list[k])] = dev_cl_zm
 			self.deriv_vec[param] = dev_cl
-			'''
+			
 	def cov_matrix (self):
 		""" Construct covariance matrix """
 
@@ -231,9 +233,10 @@ class fisher (object):
 		tag = "0"
 		run_21cm (self.params_list, tag)
 		Cl = set_cl_21 (tag)
-		'''
+		l_list = Cl.l_list	
 		for i in range(len(self.z_m_list)):
 			cl_zm = Cl.cl21T (self.z_m_list[i], self.w_list[i])
+			cl_zm = np.interp (self.l_list, l_list, cl_zm)
 			cl21T["{0}".format(i,i)] = cl_zm
 		for i in range(len(self.z_m_list)):
 			for j in range(len(self.z_m_list)):
@@ -241,6 +244,7 @@ class fisher (object):
 					zm = [self.z_m_list[i], self.z_m_list[j]]
 					w = [self.w_list[i], self.w_list[j]]
 					cl_zmzl = Cl.cl21 (zm, w)
+					cl_zmzl = np.interp (self.l_list, l_list, cl_zmzl)
 					if i == j:
 						cl21["{0}{1}".format(i,j)] = cl_zmzl
 					else:
@@ -256,7 +260,7 @@ class fisher (object):
 			for j in range(len(self.z_m_list)):
 				element_ij = (cl21["{0}{1}".format(i,j)] * clTT + cl21T["{0}".format(i)]*cl21T["{0}".format(j)]) / (2*self.l_list+1)
 				self.cov["{0}{1}".format(i,j)] = element_ij
-		'''
+		
 	def fisher_analysis (self):
 		""" Do fisher analysis with results from deriv_vec (self) and cov_matrix (self) """
 		
