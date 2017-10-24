@@ -94,7 +94,7 @@ class cl_21 (object):
 		self.A10 = 2.85*10**-15 / self.c											# /m	
 		self.B10 = self.A10*(1+1/(np.e**(self.E10/self.Tr)-1))							# /m
 		
-		l_list = np.logspace(np.log10(2), np.log10(5000), 1000)
+		l_list = np.logspace(np.log10(2), np.log10(5000), 500)
 		#l_list = np.logspace(np.log10(2), np.log10(10), 2)
 		for i in range(len(l_list)):
 			l_list[i] = int(l_list[i])
