@@ -14,8 +14,6 @@ def run_sel(w,z_m):
 	width = w*10**6#/(1+z_m)
 	freq1 = freq-4*width
 	#print (freq1 >0)
-	if freq1 < 0:
-		freq1 = 0.1
 	freq2 = freq+4*width
 	f = np.linspace(freq1,freq2,5000)
 	l = c/f
@@ -26,9 +24,11 @@ def run_sel(w,z_m):
 	z1 = wl1/wavelength-1
 	z2 = wl2/wavelength-1
 	sigma_wl = wl2-wl1
+	
+	zz = np.linspace(400,10,5000)
 
 	sel_func = 1/np.sqrt(2*np.pi*width**2) * np.exp (-(f-freq)**2/(2*width**2))
-	sel_func = f0/(1+z)**2 * 1/np.sqrt(2*np.pi*width**2) * np.exp (-(f0/(1+z)-f0/(1+z_m))**2/(2*width**2))
+	sel_func = f0/(1+zz)**2 * 1/np.sqrt(2*np.pi*width**2) * np.exp (-(f0/(1+zz)-f0/(1+z_m))**2/(2*width**2))
 	
 	#plt.plot(z[::-1], sel_func[::-1], label = 'f')
 	#plt.axis([0,200,0,max(sel_func)])
@@ -37,7 +37,7 @@ def run_sel(w,z_m):
 	#print (simps(sel_func[::-1], z[::-1]))
 	#print (max(z), min(z), max(z)-min(z))	
 	#plt.show()
-	return z[::-1], sel_func[::-1], max(z)-min(z)
+	return zz[::-1], sel_func[::-1], max(z)-min(z)
 
 #for i in range(len(w)):
 #	run_sel(w[i],z_m[i])
