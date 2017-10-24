@@ -225,8 +225,8 @@ class cl_21 (object):
 			T_dphidz.append (p)
 			bb = self.baryon[self.number_of_z2*i:self.number_of_z2*(i+1)][::-1]
 			T_baryon.append (bb)
-		T_dphidz = interp2d (self.zlist2, self.klist2, T_dphidz[::-1], kind = 'quintic')
-		T_baryon = interp2d (self.zlist2, self.klist2, T_baryon[::-1], kind = 'quintic')
+		T_dphidz = interp2d (self.zlist2, self.klist2, T_dphidz[::-1], kind = 'cubic')
+		T_baryon = interp2d (self.zlist2, self.klist2, T_baryon[::-1], kind = 'cubic')
 
 		delta_21 = self.T21[::-1].copy ()
 		zz = self.zz[::-1].copy ()
@@ -274,11 +274,8 @@ class cl_21 (object):
 	def cl21 (self, z_m, w):
 		""" Calculate 21 cm auto-correlation functions """
 		
-		z = np.linspace(10,400,1000)
-		z1, sel1, _ = sf.run_sel (w[0], z_m[0])
-		z2, sel2, _ = sf.run_sel (w[1], z_m[1])
-		sel1 = np.interp (z, z1, sel1)
-		sel2 = np.interp (z, z2, sel2)
+		z, sel1, _ = sf.run_sel (w[0], z_m[0])
+		z, sel2, _ = sf.run_sel (w[1], z_m[1])
 
 		chi_class_local = np.interp (z, self.zlist2, self.chi_class)
 		hubble_local = np.interp (z, self.zlist2, self.hubble_class)
@@ -287,7 +284,7 @@ class cl_21 (object):
 		for i in range(self.number_of_k2):
 			bb = self.baryon[self.number_of_z2*i:self.number_of_z2*(i+1)][::-1]
 			T_baryon.append (bb)
-		T_baryon = interp2d (self.zlist2, self.klist2, T_baryon[::-1], kind = 'quintic')
+		T_baryon = interp2d (self.zlist2, self.klist2, T_baryon[::-1], kind = 'cubic')
 		
 		"""
 		delta_21 =[]
@@ -301,8 +298,8 @@ class cl_21 (object):
 			d = self.redshift_distortion[number_of_z*i:number_of_z*(i+1)][::-1]
 			d = d*bb
 			distortion.append (d)
-		delta_21 = interp2d (zlist, klist, delta_21[::-1], kind = 'quintic')
-		distortion = interp2d (zlist, klist, distortion[::-1], kind = 'quintic')
+		delta_21 = interp2d (zlist, klist, delta_21[::-1], kind = 'cubic')
+		distortion = interp2d (zlist, klist, distortion[::-1], kind = 'cubic')
 		"""
 		delta_21 = self.T21[::-1].copy ()
 		zz = self.zz[::-1].copy ()
@@ -341,7 +338,7 @@ class cl_21 (object):
 		for i in range(self.number_of_k2):
 			bb = self.baryon[self.number_of_z2*i:self.number_of_z2*(i+1)][::-1]
 			T_baryon.append (bb)
-		T_baryon = interp2d (self.zlist2, self.klist2, T_baryon[::-1], kind = 'quintic')
+		T_baryon = interp2d (self.zlist2, self.klist2, T_baryon[::-1], kind = 'cubic')
 		
 		"""
 		delta_21 =[]
@@ -354,8 +351,8 @@ class cl_21 (object):
 			d = self.redshift_distortion[number_of_z*i:number_of_z*(i+1)][::-1]
 			d = d*bb
 			distortion.append (d)
-		delta_21 = interp2d (zlist, klist, delta_21[::-1], kind = 'quintic')
-		distortion = interp2d (zlist, klist, distortion[::-1], kind = 'quintic')
+		delta_21 = interp2d (zlist, klist, delta_21[::-1], kind = 'cubic')
+		distortion = interp2d (zlist, klist, distortion[::-1], kind = 'cubic')
 		"""
 		
 		delta_21 = self.T21[0:self.number_of_z][::-1]
@@ -408,8 +405,8 @@ class cl_21 (object):
 			bb = self.baryon[self.number_of_z2*i:self.number_of_z2*(i+1)][::-1]
 			delta_21.append (T21*bb)
 			distortion.append (redshift_distortion*bb)
-		delta_21 = interp2d (self.zlist, self.klist, delta_21[::-1], kind = 'quintic')
-		distortion = interp2d (self.zlist, self.klist, distortion[::-1], kind = 'quintic')
+		delta_21 = interp2d (self.zlist, self.klist, delta_21[::-1], kind = 'cubic')
+		distortion = interp2d (self.zlist, self.klist, distortion[::-1], kind = 'cubic')
 	
 		"""
 		delta_21 =[]
@@ -424,8 +421,8 @@ class cl_21 (object):
 			d = redshift_distortion[number_of_z*i:number_of_z*(i+1)][::-1]
 			d = d*bb
 			distortion.append (d)
-		delta_21 = interp2d (zlist, klist, delta_21[::-1], kind = 'quintic')
-		distortion = interp2d (zlist, klist, distortion[::-1], kind = 'quintic')
+		delta_21 = interp2d (zlist, klist, delta_21[::-1], kind = 'cubic')
+		distortion = interp2d (zlist, klist, distortion[::-1], kind = 'cubic')
 		"""
 		
 		cl_list = []
