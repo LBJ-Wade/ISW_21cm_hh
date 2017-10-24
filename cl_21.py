@@ -100,7 +100,7 @@ class cl_21 (object):
 		for i in range(len(l_list)):
 			l_list[i] = int(l_list[i])
 		l_list = sorted(set(l_list))
-		#l_list[-1] += 1
+		l_list[-1] += 1
 		self.l_list = np.array (l_list)
 
 
