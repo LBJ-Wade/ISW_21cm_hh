@@ -225,7 +225,7 @@ class fisher (object):
 					dev_cl_zm = (cl2_zm-cl1_zm)/(2*stepsize)
 				dev_cl['{0}'.format (self.z_m_list[k])] = dev_cl_zm
 				dev_list.append (dev_cl_zm)
-			out_zm = path_result + '/cl21T_deriv_'+param'.txt'
+			out_zm = path_result + '/cl21T_deriv_'+param+'.txt'
 			data = np.column_stack((self.l_list, dev_list[0], dev_list[1], dev_list[2], dev_list[3], dev_list[4], dev_list[5], dev_list[6], dev_list[7]))
 			np.savetxt(out_zm, data, fmt = '%1.6e')
 			
