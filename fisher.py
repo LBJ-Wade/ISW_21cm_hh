@@ -4,9 +4,9 @@ from cl_21 import *
 
 class prior_cmb (object):		# Need to add cl^dd
 	def __init__ (self):
-		self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.1e-9, 0.01, 0.02/3, [0.7117357, 0.721146] ]
+		self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.1e-9, 0.01, 0.02/3]#, [0.7117357, 0.721146] ]
 		self.params_list = np.loadtxt (params_input)[0:,]
-		self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
+		self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu']#,'Neff']
 		self.deriv_vec = {}
 		self.cov = {}
 		self.l_list = None
@@ -213,6 +213,7 @@ class fisher (object):
 			
 			
 			dev_cl = {}
+			dev_list = []
 			for k in range(len(self.z_m_list)):
 				cl1_zm = Cl1.cl21T (self.z_m_list[k], self.w_list[k])
 				cl1_zm = np.interp (self.l_list, l_list, cl1_zm)
@@ -223,6 +224,11 @@ class fisher (object):
 				else:
 					dev_cl_zm = (cl2_zm-cl1_zm)/(2*stepsize)
 				dev_cl['{0}'.format (self.z_m_list[k])] = dev_cl_zm
+				dev_list.append (dev_cl_zm)
+			out_zm = path_result + '/cl21T_deriv_'+param'.txt'
+			data = np.column_stack((self.l_list, dev_list[0], dev_list[1], dev_list[2], dev_list[3], dev_list[4], dev_list[5], dev_list[6], dev_list[7]))
+			np.savetxt(out_zm, data, fmt = '%1.6e')
+			
 			self.deriv_vec[param] = dev_cl
 			
 	def cov_matrix (self):
@@ -234,10 +240,17 @@ class fisher (object):
 		run_21cm (self.params_list, tag)
 		Cl = set_cl_21 (tag)
 		l_list = Cl.l_list	
+		cl21T_list = []
+		
 		for i in range(len(self.z_m_list)):
 			cl_zm = Cl.cl21T (self.z_m_list[i], self.w_list[i])
 			cl_zm = np.interp (self.l_list, l_list, cl_zm)
 			cl21T["{0}".format(i,i)] = cl_zm
+			cl21T_list.append (cl_zm)
+		out_zm = path_result + '/cl21T_0.txt'
+		data = np.column_stack((self.l_list, cl21T_list[0], cl21T_list[1], cl21T_list[2], cl21T_list[3], cl21T_list[4], cl21T_list[5], cl21T_list[6], cl21T_list[7]))
+		np.savetxt(out_zm, data, fmt = '%1.6e')
+		
 		for i in range(len(self.z_m_list)):
 			for j in range(len(self.z_m_list)):
 				if not j < i:
@@ -250,6 +263,9 @@ class fisher (object):
 					else:
 						cl21["{0}{1}".format(i,j)] = cl_zmzl
 						cl21["{0}{1}".format(j,i)] = cl_zmzl
+					out_zm = path_result + '/cl21zmzl_{0}{1}.txt'.format(i,j)
+					data = np.column_stack((self.l_list, cl_zmzl))
+					np.savetxt(out_zm, data, fmt = '%1.6e')
 		
 		cl_out = path_result + "/cl_" + tag + ".dat"
 		l = np.loadtxt(cl_out)[0:,0]
@@ -344,7 +360,6 @@ F.cl21T_deriv_vec ()
 F.convergence_test ()
 """
 # Fisher Analysis
-
 F = fisher ()
 F.cl21T_deriv_vec ()
 F.cov_matrix ()
@@ -365,16 +380,18 @@ inv_fisher = inv(fisher_matrix)
 #print (fisher_matrix)
 #print (inv(fisher_matrix))
 #print (np.dot (fisher_matrix, inv(fisher_matrix)))
-
 """
+
 sigma = []
 for i in range(len(fisher_matrix)):
 	sigma.append (inv_fisher[i,i])
 sigma = np.array(sigma)
 data = np.column_stack((sigma))
-np.savetxt('sigma_cl21T.txt', data, fmt = '%1.6e')
 
+np.savetxt('sigma_cl21T.txt', data, fmt = '%1.6e')
 data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6],fisher_matrix[7]))
-#data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2]))
 np.savetxt('fisher_matrix_cl21T.txt', data, fmt = '%1.6e')
+#np.savetxt('sigma.txt', data, fmt = '%1.6e')
+#data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6]))
+#np.savetxt('fisher_matrix.txt', data, fmt = '%1.6e')
 
