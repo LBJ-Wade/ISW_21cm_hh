@@ -4,9 +4,9 @@ from cl_21 import *
 
 class prior_cmb (object):		# Need to add cl^dd
 	def __init__ (self):
-		self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.1e-9, 0.01, 0.02/3]#, [0.7117357, 0.721146] ]
+		self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.1e-9, 0.01, 0.02/3, [0.7117357, 0.721146] ]
 		self.params_list = np.loadtxt (params_input)[0:,]
-		self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu']#,'Neff']
+		self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
 		self.deriv_vec = {}
 		self.cov = {}
 		self.l_list = None
@@ -68,16 +68,20 @@ class prior_cmb (object):		# Need to add cl^dd
 	def cov_matrix (self):
 		""" Construct covariance matrix """
 		print ('Start cov_matrix')
-
+		
 		cov = {}
 		tag = "0"
 		#outfile = run_cmb (self.params_list, tag)
 		outfile = path_data + "/cl_" + tag + ".dat"
 		l = np.loadtxt (outfile)[28:,0]
+		clTT_N = (2*0.000290888)**2 *np.e**(l*(l+1)*0.000290888**2/(8*np.log(2)))
+		clEE_N = 2*clTT_N
 		self.l_list = l
 		clTT = np.loadtxt (outfile)[28:,1] / (l*(l+1)/(2*np.pi)) 
+		clTT += clTT_N
 		clTE = np.loadtxt (outfile)[28:,4] / (l*(l+1)/(2*np.pi)) 
 		clEE = np.loadtxt (outfile)[28:,2] / (l*(l+1)/(2*np.pi)) 
+		clEE += clEE_N
 		cldd = np.loadtxt (outfile)[28:,5] / (l*(l+1)/(2*np.pi))
 		clTd = np.loadtxt (outfile)[28:,6] / (l*(l+1)/(2*np.pi))
 		clEd = np.loadtxt (outfile)[28:,7] / (l*(l+1)/(2*np.pi))
@@ -358,6 +362,7 @@ F = fisher ()
 F.cl21T_deriv_vec ()
 F.convergence_test ()
 """
+'''
 # Fisher Analysis
 F = fisher ()
 F.cl21T_deriv_vec ()
@@ -367,10 +372,10 @@ inv_fisher = inv(fisher_matrix)
 print (fisher_matrix)
 print (inv(fisher_matrix))
 print (np.dot (fisher_matrix, inv(fisher_matrix)))
-
+'''
 
 # Fisher CMB
-"""
+
 F = prior_cmb ()
 F.cmb_deriv_vec ()
 F.cov_matrix ()
@@ -379,7 +384,7 @@ inv_fisher = inv(fisher_matrix)
 #print (fisher_matrix)
 #print (inv(fisher_matrix))
 #print (np.dot (fisher_matrix, inv(fisher_matrix)))
-"""
+
 
 sigma = []
 for i in range(len(fisher_matrix)):
@@ -387,10 +392,10 @@ for i in range(len(fisher_matrix)):
 sigma = np.array(sigma)
 data = np.column_stack((sigma))
 
-np.savetxt('sigma_cl21T.txt', data, fmt = '%1.6e')
-data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6],fisher_matrix[7]))
-np.savetxt('fisher_matrix_cl21T.txt', data, fmt = '%1.6e')
-#np.savetxt('sigma.txt', data, fmt = '%1.6e')
-#data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6]))
-#np.savetxt('fisher_matrix.txt', data, fmt = '%1.6e')
+#np.savetxt('sigma_cl21T.txt', data, fmt = '%1.6e')
+#data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6],fisher_matrix[7]))
+#np.savetxt('fisher_matrix_cl21T.txt', data, fmt = '%1.6e')
+np.savetxt('sigma.txt', data, fmt = '%1.6e')
+data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6]))
+np.savetxt('fisher_matrix.txt', data, fmt = '%1.6e')
 
