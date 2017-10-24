@@ -19,7 +19,6 @@ def set_cl_21 (tag):		# At the end, it would take z_m_list, w_list as arguments
 	outfile = file_names[4]
 	
 	params_list = np.loadtxt (params_input)[0:,]
-	print infile_HYREC
 	Cl = cl_21 (params_list, infile_HYREC, infile_syn, infile_new)
 	Cl.test_run () 
 	Cl.c_z ()
