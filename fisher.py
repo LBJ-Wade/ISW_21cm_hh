@@ -211,6 +211,7 @@ class fisher (object):
 			run_21cm (params_list_copy, tag)
 			Cl2 = set_cl_21 (tag)
 			
+			'''
 			dev_cl = {}
 			for k in range(len(self.z_m_list)):
 				cl1_zm = Cl1.cl21T (self.z_m_list[k], self.w_list[k])
@@ -221,7 +222,7 @@ class fisher (object):
 					dev_cl_zm = (cl2_zm-cl1_zm)/(2*stepsize)
 				dev_cl['{0}'.format (self.z_m_list[k])] = dev_cl_zm
 			self.deriv_vec[param] = dev_cl
-
+			'''
 	def cov_matrix (self):
 		""" Construct covariance matrix """
 
@@ -230,6 +231,7 @@ class fisher (object):
 		tag = "0"
 		run_21cm (self.params_list, tag)
 		Cl = set_cl_21 (tag)
+		'''
 		for i in range(len(self.z_m_list)):
 			cl_zm = Cl.cl21T (self.z_m_list[i], self.w_list[i])
 			cl21T["{0}".format(i,i)] = cl_zm
@@ -254,7 +256,7 @@ class fisher (object):
 			for j in range(len(self.z_m_list)):
 				element_ij = (cl21["{0}{1}".format(i,j)] * clTT + cl21T["{0}".format(i)]*cl21T["{0}".format(j)]) / (2*self.l_list+1)
 				self.cov["{0}{1}".format(i,j)] = element_ij
-		
+		'''
 	def fisher_analysis (self):
 		""" Do fisher analysis with results from deriv_vec (self) and cov_matrix (self) """
 		
