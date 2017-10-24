@@ -69,6 +69,7 @@ class prior_cmb (object):		# Need to add cl^dd
 		""" Construct covariance matrix """
 		print ('Start cov_matrix')
 		
+		f_sky = 0.7	
 		cov = {}
 		tag = "0"
 		#outfile = run_cmb (self.params_list, tag)
@@ -86,19 +87,19 @@ class prior_cmb (object):		# Need to add cl^dd
 		clTd = np.loadtxt (outfile)[28:,6] / (l*(l+1)/(2*np.pi))
 		clEd = np.loadtxt (outfile)[28:,7] / (l*(l+1)/(2*np.pi))
 		
-		cov['11'] = 2 * clTT**2 / (2*l+1)
-		cov['22'] = (clTT*clEE + clTE**2) / (2*l+1)
-		cov['33'] = 2 * clEE**2 / (2*l+1)
-		cov['44'] = 2 * cldd**2 / (2*l+1)
+		cov['11'] = f_sky * 2 * clTT**2 / (2*l+1)
+		cov['22'] = f_sky * (clTT*clEE + clTE**2) / (2*l+1)
+		cov['33'] = f_sky * 2 * clEE**2 / (2*l+1)
+		cov['44'] = f_sky * 2 * cldd**2 / (2*l+1)
 
-		cov['12'] = 2 * clTT*clTE / (2*l+1); cov['21'] = 2 * clTT*clTE / (2*l+1)
-		cov['13'] = 2 * clTE**2	/ (2*l+1); cov['31'] = 2 * clTE**2	/ (2*l+1)
-		cov['14'] = 2 * clTd**2 / (2*l+1); cov['41'] = 2 * clTd**2 / (2*l+1)
+		cov['12'] = f_sky * 2 * clTT*clTE / (2*l+1); cov['21'] = f_sky * 2 * clTT*clTE / (2*l+1)
+		cov['13'] = f_sky * 2 * clTE**2	/ (2*l+1); cov['31'] = f_sky * 2 * clTE**2	/ (2*l+1)
+		cov['14'] = f_sky * 2 * clTd**2 / (2*l+1); cov['41'] = f_sky * 2 * clTd**2 / (2*l+1)
 		
-		cov['23'] = 2 * clTE*clEE / (2*l+1); cov['32'] = 2 * clTE*clEE / (2*l+1)
-		cov['24'] = 2 * clTd*clEd / (2*l+1); cov['42'] = 2 * clTd*clEd / (2*l+1)
+		cov['23'] = f_sky * 2 * clTE*clEE / (2*l+1); cov['32'] = f_sky * 2 * clTE*clEE / (2*l+1)
+		cov['24'] = f_sky * 2 * clTd*clEd / (2*l+1); cov['42'] = f_sky * 2 * clTd*clEd / (2*l+1)
 		
-		cov['34'] = 2 * clEd**2 / (2*l+1); cov['43'] = 2 * clEd**2 / (2*l+1)
+		cov['34'] = f_sky * 2 * clEd**2 / (2*l+1); cov['43'] = f_sky * 2 * clEd**2 / (2*l+1)
 
 		self.cov = cov
 		
