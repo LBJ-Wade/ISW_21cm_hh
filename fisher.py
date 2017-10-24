@@ -164,7 +164,7 @@ class prior_cmb (object):		# Need to add cl^dd
 				
 							inv_cov[i,j] = self.cov["{0}{1}".format(i+2,j+2)][l]
 					inv_cov = inv(inv_cov)
-					F_mn += vec_m[i]*inv_cov[i,j]*vec_n[j]
+					F_mn += np.dot(vec_m, np.dot(inv_cov, vec_n))
 				F[m,n] = F_mn
 		return F
 
@@ -362,6 +362,7 @@ F = fisher ()
 F.cl21T_deriv_vec ()
 F.convergence_test ()
 """
+'''
 # Fisher Analysis
 F = fisher ()
 F.cl21T_deriv_vec ()
@@ -372,8 +373,8 @@ print (fisher_matrix)
 print (inv(fisher_matrix))
 print (np.dot (fisher_matrix, inv(fisher_matrix)))
 
-# Fisher CMB
 '''
+# Fisher CMB
 F = prior_cmb ()
 F.cmb_deriv_vec ()
 F.cov_matrix ()
@@ -382,7 +383,6 @@ inv_fisher = inv(fisher_matrix)
 #print (fisher_matrix)
 #print (inv(fisher_matrix))
 #print (np.dot (fisher_matrix, inv(fisher_matrix)))
-'''
 
 sigma = []
 for i in range(len(fisher_matrix)):
@@ -390,10 +390,10 @@ for i in range(len(fisher_matrix)):
 sigma = np.array(sigma)
 data = np.column_stack((sigma))
 
-np.savetxt('sigma_cl21T.txt', data, fmt = '%1.6e')
-data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6],fisher_matrix[7]))
-np.savetxt('fisher_matrix_cl21T.txt', data, fmt = '%1.6e')
-#np.savetxt('sigma.txt', data, fmt = '%1.6e')
-#data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6]))
-#np.savetxt('fisher_matrix.txt', data, fmt = '%1.6e')
+#np.savetxt('sigma_cl21T.txt', data, fmt = '%1.6e')
+#data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6],fisher_matrix[7]))
+#np.savetxt('fisher_matrix_cl21T.txt', data, fmt = '%1.6e')
+np.savetxt('sigma.txt', data, fmt = '%1.6e')
+data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6]))
+np.savetxt('fisher_matrix.txt', data, fmt = '%1.6e')
 
