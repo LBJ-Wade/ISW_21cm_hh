@@ -54,7 +54,7 @@ class prior_cmb (object):		# Need to add cl^dd
 				dev_clTE = (clTE2-clTE1)/(2*0.08)
 				dev_clEE = (clEE2-clEE1)/(2*0.08)
 				dev_cldd = (cldd2-cldd1)/(2*0.08)
-			else param == 'm_nu':
+			elif param == 'm_nu':
 				dev_clTT = (clTT2-clTT1)/(2*stepsize*3)
 				dev_clTE = (clTE2-clTE1)/(2*stepsize*3)
 				dev_clEE = (clEE2-clEE1)/(2*stepsize*3)
