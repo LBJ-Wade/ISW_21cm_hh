@@ -69,6 +69,7 @@ class prior_cmb (object):		# Need to add cl^dd
 		""" Construct covariance matrix """
 		print ('Start cov_matrix')
 		
+		f_sky = 0.7	
 		cov = {}
 		tag = "0"
 		#outfile = run_cmb (self.params_list, tag)
@@ -86,19 +87,19 @@ class prior_cmb (object):		# Need to add cl^dd
 		clTd = np.loadtxt (outfile)[28:,6] / (l*(l+1)/(2*np.pi))
 		clEd = np.loadtxt (outfile)[28:,7] / (l*(l+1)/(2*np.pi))
 		
-		cov['11'] = 2 * clTT**2 / (2*l+1)
-		cov['22'] = (clTT*clEE + clTE**2) / (2*l+1)
-		cov['33'] = 2 * clEE**2 / (2*l+1)
-		cov['44'] = 2 * cldd**2 / (2*l+1)
+		cov['11'] = f_sky * 2 * clTT**2 / (2*l+1)
+		cov['22'] = f_sky * (clTT*clEE + clTE**2) / (2*l+1)
+		cov['33'] = f_sky * 2 * clEE**2 / (2*l+1)
+		cov['44'] = f_sky * 2 * cldd**2 / (2*l+1)
 
-		cov['12'] = 2 * clTT*clTE / (2*l+1); cov['21'] = 2 * clTT*clTE / (2*l+1)
-		cov['13'] = 2 * clTE**2	/ (2*l+1); cov['31'] = 2 * clTE**2	/ (2*l+1)
-		cov['14'] = 2 * clTd**2 / (2*l+1); cov['41'] = 2 * clTd**2 / (2*l+1)
+		cov['12'] = f_sky * 2 * clTT*clTE / (2*l+1); cov['21'] = f_sky * 2 * clTT*clTE / (2*l+1)
+		cov['13'] = f_sky * 2 * clTE**2	/ (2*l+1); cov['31'] = f_sky * 2 * clTE**2	/ (2*l+1)
+		cov['14'] = f_sky * 2 * clTd**2 / (2*l+1); cov['41'] = f_sky * 2 * clTd**2 / (2*l+1)
 		
-		cov['23'] = 2 * clTE*clEE / (2*l+1); cov['32'] = 2 * clTE*clEE / (2*l+1)
-		cov['24'] = 2 * clTd*clEd / (2*l+1); cov['42'] = 2 * clTd*clEd / (2*l+1)
+		cov['23'] = f_sky * 2 * clTE*clEE / (2*l+1); cov['32'] = f_sky * 2 * clTE*clEE / (2*l+1)
+		cov['24'] = f_sky * 2 * clTd*clEd / (2*l+1); cov['42'] = f_sky * 2 * clTd*clEd / (2*l+1)
 		
-		cov['34'] = 2 * clEd**2 / (2*l+1); cov['43'] = 2 * clEd**2 / (2*l+1)
+		cov['34'] = f_sky * 2 * clEd**2 / (2*l+1); cov['43'] = f_sky * 2 * clEd**2 / (2*l+1)
 
 		self.cov = cov
 		
@@ -164,7 +165,7 @@ class prior_cmb (object):		# Need to add cl^dd
 				
 							inv_cov[i,j] = self.cov["{0}{1}".format(i+2,j+2)][l]
 					inv_cov = inv(inv_cov)
-					F_mn += vec_m[i]*inv_cov[i,j]*vec_n[j]
+					F_mn += np.dot(vec_m, np.dot(inv_cov, vec_n))
 				F[m,n] = F_mn
 		return F
 
@@ -362,6 +363,7 @@ F = fisher ()
 F.cl21T_deriv_vec ()
 F.convergence_test ()
 """
+'''
 # Fisher Analysis
 F = fisher ()
 F.cl21T_deriv_vec ()
@@ -372,8 +374,8 @@ print (fisher_matrix)
 print (inv(fisher_matrix))
 print (np.dot (fisher_matrix, inv(fisher_matrix)))
 
-# Fisher CMB
 '''
+# Fisher CMB
 F = prior_cmb ()
 F.cmb_deriv_vec ()
 F.cov_matrix ()
@@ -382,7 +384,6 @@ inv_fisher = inv(fisher_matrix)
 #print (fisher_matrix)
 #print (inv(fisher_matrix))
 #print (np.dot (fisher_matrix, inv(fisher_matrix)))
-'''
 
 sigma = []
 for i in range(len(fisher_matrix)):
@@ -390,10 +391,10 @@ for i in range(len(fisher_matrix)):
 sigma = np.array(sigma)
 data = np.column_stack((sigma))
 
-np.savetxt('sigma_cl21T.txt', data, fmt = '%1.6e')
-data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6],fisher_matrix[7]))
-np.savetxt('fisher_matrix_cl21T.txt', data, fmt = '%1.6e')
-#np.savetxt('sigma.txt', data, fmt = '%1.6e')
-#data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6]))
-#np.savetxt('fisher_matrix.txt', data, fmt = '%1.6e')
+#np.savetxt('sigma_cl21T.txt', data, fmt = '%1.6e')
+#data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6],fisher_matrix[7]))
+#np.savetxt('fisher_matrix_cl21T.txt', data, fmt = '%1.6e')
+np.savetxt('sigma.txt', data, fmt = '%1.6e')
+data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6]))
+np.savetxt('fisher_matrix.txt', data, fmt = '%1.6e')
 

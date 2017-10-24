@@ -47,8 +47,8 @@ class cl_21 (object):
 		self.baryon = -np.loadtxt(self.infile_syn)[0:,2]
 		self.baryon_dot = -np.loadtxt(self.infile_syn)[0:,3]
 
-		As = self.params_list[5]
-		n_s = self.params_list[6]
+		As = self.params_list[4]
+		n_s = self.params_list[5]
 		k_pivot = 0.05
 		self.k_list = np.logspace (-4,5, 5000)
 		self.P_phi = As * (self.k_list/k_pivot)**(n_s-1) * 2*np.pi**2 / self.k_list**3
@@ -82,7 +82,8 @@ class cl_21 (object):
 		self.Yp = 0.245
 		self.Omega_b = self.params_list[1]
 		self.eV_to_m_inv = 5076142.131979696
-		self.h = self.params_list[0]
+		#self.h = self.params_list[0]
+		self.h = 6.706290e-01
 		self.rho_cr = 8.056*10**-11 * self.h**2 # eV^4
 		self.mp = 938.2720813*10**6  #eV
 		self.me = 0.5109989461*10**6	#eV
