@@ -27,8 +27,8 @@ def run_21cm (params_list, tag, cross = True):
 	
 	
 	#Delete unnecessary output file in CLASS
-	os.system ("rm class_syn/output/*")
-	os.system ("rm class_new/output/*")
+	#os.system ("rm class_syn/output/*")
+	#os.system ("rm class_new/output/*")
 
 	# Run CLASS (syncronous gauge)
 	os.chdir (path_CLASS_syn)
