@@ -212,21 +212,21 @@ Cosmological parameters Input/Output
 void rec_get_cosmoparam(FILE *fin, FILE *fout, REC_COSMOPARAMS *param) {
 
     /* Cosmology */
-    if (fout!=NULL && PROMPT==1) fprintf(fout, "Enter CMB temperature today [Kelvin]: ");
+    if (fout!=NULL && PROMPT==1) /*fprintf(fout, "Enter CMB temperature today [Kelvin]: ");*/
     fscanf(fin, "%lg", &(param->T0));
-    if (fout!=NULL && PROMPT==1) fprintf(fout, "Enter baryon density, omega_bh2: ");
+    if (fout!=NULL && PROMPT==1) /*fprintf(fout, "Enter baryon density, omega_bh2: ");*/
     fscanf(fin, "%lg", &(param->obh2));
-    if (fout!=NULL && PROMPT==1) fprintf(fout, "Enter total matter (CDM+baryons) density, omega_mh2: ");
+    if (fout!=NULL && PROMPT==1) /*fprintf(fout, "Enter total matter (CDM+baryons) density, omega_mh2: ");*/
     fscanf(fin, "%lg", &(param->omh2));
-    if (fout!=NULL && PROMPT==1) fprintf(fout, "Enter curvature, omega_kh2: ");
+    if (fout!=NULL && PROMPT==1) /*fprintf(fout, "Enter curvature, omega_kh2: ");*/
     fscanf(fin, "%lg", &(param->okh2));
-    if (fout!=NULL && PROMPT==1) fprintf(fout, "Enter dark energy density, omega_deh2: ");
+    if (fout!=NULL && PROMPT==1) /*fprintf(fout, "Enter dark energy density, omega_deh2: ");*/
     fscanf(fin, "%lg", &(param->odeh2));
-    if (fout!=NULL && PROMPT==1) fprintf(fout, "Enter dark energy equation of state parameters, w wa: ");
+    if (fout!=NULL && PROMPT==1) /*fprintf(fout, "Enter dark energy equation of state parameters, w wa: ");*/
     fscanf(fin, "%lg %lg", &(param->w0), &(param->wa));
-    if (fout!=NULL && PROMPT==1) fprintf(fout, "Enter primordial helium mass fraction, Y: ");
+    if (fout!=NULL && PROMPT==1) /*fprintf(fout, "Enter primordial helium mass fraction, Y: ");*/
     fscanf(fin, "%lg", &(param->Y));
-    if (fout!=NULL && PROMPT==1) fprintf(fout, "Enter effective number of neutrino species, N_nu_eff: ");
+    if (fout!=NULL && PROMPT==1) /*fprintf(fout, "Enter effective number of neutrino species, N_nu_eff: ");*/
     fscanf(fin, "%lg", &(param->Nnueff));
 
     /****** Added May 2012: explicit dependence on fine-structure constant and electron mass ******/
