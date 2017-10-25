@@ -16,13 +16,13 @@ class prior_cmb (object):		# Need to add cl^dd
 		for j in range(len(self.fisher_params)):
 			param = self.fisher_params[j]
 			stepsize = self.stepsize[j]
-
-			"""
+		
+			
 			params_list_copy = self.params_list.copy ()
 			if param == 'Neff':
 				params_list_copy[j] = stepsize[0]
 			else:
-				params_list_copy[j] -= stepsize 
+				params_list_copy[j] -= stepsize
 			tag = param + "1"
 			outfile1 = run_cmb (params_list_copy, tag)
 
@@ -30,24 +30,23 @@ class prior_cmb (object):		# Need to add cl^dd
 			if param == 'Neff':
 				params_list_copy[j] = stepsize[1]
 			else:
-				params_list_copy[j] += stepsize 
+				params_list_copy[j] += stepsize
 			tag = param + "2"
 			outfile2 = run_cmb (params_list_copy, tag)
-			"""
-			outfile1 = path_data + "/cl_" + param+"1" + ".dat"
-			outfile2 = path_data + "/cl_" + param+"2" + ".dat"
+			
+
+			#outfile1 = path_data + "/cl_" + param+"1" + ".dat"
+			#outfile2 = path_data + "/cl_" + param+"2" + ".dat"
 			dev_cl = {}
 			l = np.loadtxt (outfile1)[28:,0]
 			clTT1 = np.loadtxt (outfile1)[28:,1] / (l*(l+1)/(2*np.pi)) 
-			clTT1[2970:] = 0
 			clTT2 = np.loadtxt (outfile2)[28:,1] / (l*(l+1)/(2*np.pi)) 
-			clTT2[2970:] = 0
 			clTE1 = np.loadtxt (outfile1)[28:,4] / (l*(l+1)/(2*np.pi)) 
 			clTE2 = np.loadtxt (outfile2)[28:,4] / (l*(l+1)/(2*np.pi)) 
 			clEE1 = np.loadtxt (outfile1)[28:,2] / (l*(l+1)/(2*np.pi)) 
 			clEE2 = np.loadtxt (outfile2)[28:,2] / (l*(l+1)/(2*np.pi)) 
-			cldd1 = np.loadtxt (outfile1)[28:,5] / (l*(l+1)/(2*np.pi))
-			cldd2 = np.loadtxt (outfile2)[28:,5] / (l*(l+1)/(2*np.pi))
+			cldd1 = np.loadtxt (outfile1)[28:,5] / (l*(l+1)/(2*np.pi)) 
+			cldd2 = np.loadtxt (outfile2)[28:,5] / (l*(l+1)/(2*np.pi)) 
 			
 			if param == 'Neff':
 				dev_clTT = (clTT2-clTT1)/(2*0.08)
@@ -73,12 +72,11 @@ class prior_cmb (object):		# Need to add cl^dd
 	def cov_matrix (self):
 		""" Construct covariance matrix """
 		print ('Start cov_matrix')
-		
 		f_sky = 0.7	
 		cov = {}
 		tag = "0"
-		#outfile = run_cmb (self.params_list, tag)
-		outfile = path_data + "/cl_" + tag + ".dat"
+		outfile = run_cmb (self.params_list, tag)
+		#outfile = path_data + "/cl_" + tag + ".dat"
 		l = np.loadtxt (outfile)[28:,0]
 		clTT_N = (2*0.000290888)**2 *np.e**(l*(l+1)*0.000290888**2/(8*np.log(2)))
 		clEE_N = 2*clTT_N
@@ -88,7 +86,7 @@ class prior_cmb (object):		# Need to add cl^dd
 		clTE = np.loadtxt (outfile)[28:,4] / (l*(l+1)/(2*np.pi)) 
 		clEE = np.loadtxt (outfile)[28:,2] / (l*(l+1)/(2*np.pi)) 
 		clEE += clEE_N
-		cldd = np.loadtxt (outfile)[28:,5] / (l*(l+1)/(2*np.pi))
+		cldd = np.loadtxt (outfile)[28:,5] / (l*(l+1)/(2*np.pi)) 
 		clTd = np.loadtxt (outfile)[28:,6] / (l*(l+1)/(2*np.pi))
 		clEd = np.loadtxt (outfile)[28:,7] / (l*(l+1)/(2*np.pi))
 		
@@ -119,7 +117,6 @@ class prior_cmb (object):		# Need to add cl^dd
 				param_m = self.fisher_params[m]
 				param_n = self.fisher_params[n]
 					
-				#for l in range(len(self.l_list)):
 				for l in range(2971):
 					vec_m = np.zeros(4)
 					vec_n = np.zeros(4)
@@ -392,7 +389,7 @@ inv_fisher = inv(fisher_matrix)
 
 sigma = []
 for i in range(len(fisher_matrix)):
-	sigma.append (inv_fisher[i,i])
+	sigma.append (np.sqrt(inv_fisher[i,i]))
 sigma = np.array(sigma)
 data = np.column_stack((sigma))
 
