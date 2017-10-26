@@ -83,7 +83,7 @@ class cl_21 (object):
 		self.Omega_b = self.params_list[1]
 		self.eV_to_m_inv = 5076142.131979696
 		#self.h = self.params_list[0]
-		self.h = 6.706290e-01
+		self.h = self.params_list[10]
 		self.rho_cr = 8.056*10.**-11. * self.h**2. # eV^4
 		self.mp = 938.2720813*10.**6.  #eV
 		self.me = 0.5109989461*10.**6.	#eV
