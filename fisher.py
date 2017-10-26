@@ -204,9 +204,10 @@ class fisher (object):
 		
 		for j in range(len(self.fisher_params)):
 			param = self.fisher_params[j]
-		
 			stepsize = self.stepsize[j]
+			"""
 			params_list_copy = self.params_list.copy ()
+
 			if param == 'Neff':
 				params_list_copy[j] = stepsize[0]
 			else:
@@ -225,7 +226,21 @@ class fisher (object):
 			tag = param + "_02"
 			run_21cm (params_list_copy, tag)
 			Cl2 = set_cl_21 (tag)
+			"""
 			
+			infile1 = "params_" + param + "1.dat"
+			parmas_list_copy = np.loadtxt (infile1)[0:,]
+			tag = param + "_01"
+			run_21cm (params_list_copy, tag)
+			Cl1 = set_cl_21 (tag)
+			if j == 0:
+				l_list = Cl1.l_list
+
+			infile2 = "params_" + param + "2.dat"
+			params_list_copy = np.loadtxt (infile2)[0:,] 
+			tag = param + "_02"
+			run_21cm (params_list_copy, tag)
+			Cl2 = set_cl_21 (tag)
 			
 			dev_cl = {}
 			dev_list = []
