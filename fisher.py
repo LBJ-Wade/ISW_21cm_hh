@@ -4,7 +4,7 @@ from cl_21 import *
 
 class prior_cmb (object):		# Need to add cl^dd
 	def __init__ (self):
-		self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.1e-9, 0.01, 0.02/3, [0.7117357, 0.721146] ]
+		self.stepsize = [0.0030, 8.0e-4, 5.0e-3, 0.02, 0.1e-9, 0.01, 0.02/3, [0.7117357, 0.721146] ]
 		self.params_list = np.loadtxt (params_input)[0:,]
 		self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
 		self.deriv_vec = {}
@@ -18,7 +18,7 @@ class prior_cmb (object):		# Need to add cl^dd
 			param = self.fisher_params[j]
 			stepsize = self.stepsize[j]
 		
-			"""	
+				
 			params_list_copy = self.params_list.copy ()
 			if param == 'Neff':
 				params_list_copy[j] = stepsize[0]
@@ -34,10 +34,10 @@ class prior_cmb (object):		# Need to add cl^dd
 				params_list_copy[j] += stepsize
 			tag = param + "2"
 			outfile2 = run_cmb (params_list_copy, tag)
-			"""
+			
 
-			outfile1 = path_data + "/cl_" + param+"1" + ".dat"
-			outfile2 = path_data + "/cl_" + param+"2" + ".dat"
+			#outfile1 = path_data + "/cl_" + param+"1" + ".dat"
+			#outfile2 = path_data + "/cl_" + param+"2" + ".dat"
 			dev_cl = {}
 			l = np.loadtxt (outfile1)[28:,0]
 			clTT1 = np.loadtxt (outfile1)[28:,1] / (l*(l+1)/(2*np.pi)) 
@@ -59,6 +59,12 @@ class prior_cmb (object):		# Need to add cl^dd
 				dev_clTE = (clTE2-clTE1)/(2*stepsize*3)
 				dev_clEE = (clEE2-clEE1)/(2*stepsize*3)
 				dev_cldd = (cldd2-cldd1)/(2*stepsize*3)
+			elif param == 'theta':
+				dev_clTT = (clTT2-clTT1)/(2*stepsize/100.)
+				dev_clTE = (clTE2-clTE1)/(2*stepsize/100.)
+				dev_clEE = (clEE2-clEE1)/(2*stepsize/100.)
+				dev_cldd = (cldd2-cldd1)/(2*stepsize/100.)
+			
 			else:	
 				dev_clTT = (clTT2-clTT1)/(2*stepsize)
 				dev_clTE = (clTE2-clTE1)/(2*stepsize)
@@ -76,8 +82,8 @@ class prior_cmb (object):		# Need to add cl^dd
 		f_sky = 0.7	
 		cov = {}
 		tag = "0"
-		#outfile = run_cmb (self.params_list, tag)
-		outfile = path_data + "/cl_" + tag + ".dat"
+		outfile = run_cmb (self.params_list, tag)
+		#outfile = path_data + "/cl_" + tag + ".dat"
 		l = np.loadtxt (outfile)[28:,0]
 		clTT_N = (2*0.000290888)**2 *np.e**(l*(l+1)*(0.000290888**2)/(8*np.log(2)))
 		clEE_N = 2*clTT_N
@@ -384,47 +390,4 @@ class fisher (object):
 		
 		print ("Convergence test done")
 		return None	
-
-# Convergence Test	
-"""
-F = fisher ()
-F.cl21T_deriv_vec ()
-F.convergence_test ()
-"""
-# Fisher Analysis
-F = fisher ()
-F.cl21T_deriv_vec ()
-F.cov_matrix ()
-fisher_matrix = F.fisher_analysis ()
-data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5]))
-np.savetxt('fisher_matrix_cl21T.txt', data, fmt = '%1.6e')
-inv_fisher = inv(fisher_matrix)
-print (fisher_matrix)
-print (inv(fisher_matrix))
-print (np.dot (fisher_matrix, inv(fisher_matrix)))
-
-'''
-# Fisher CMB
-F = prior_cmb ()
-F.cmb_deriv_vec ()
-F.cov_matrix ()
-fisher_matrix = F.cmb_fisher_analysis ()
-data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5]))
-np.savetxt('fisher_matrix.txt', data, fmt = '%1.6e')
-inv_fisher = inv(fisher_matrix)
-#print (fisher_matrix)
-#print (inv(fisher_matrix))
-#print (np.dot (fisher_matrix, inv(fisher_matrix)))
-'''
-
-sigma = []
-for i in range(len(fisher_matrix)):
-	sigma.append (np.sqrt(inv_fisher[i,i]))
-sigma = np.array(sigma)
-data = np.column_stack((sigma))
-
-np.savetxt('sigma_cl21T.txt', data, fmt = '%1.6e')
-##np.savetxt('sigma.txt', data, fmt = '%1.6e')
-#data = np.column_stack((fisher_matrix[0],fisher_matrix[1],fisher_matrix[2],fisher_matrix[3],fisher_matrix[4],fisher_matrix[5],fisher_matrix[6]))
-#np.savetxt('fisher_matrix.txt', data, fmt = '%1.6e')
 
