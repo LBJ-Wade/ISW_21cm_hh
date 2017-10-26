@@ -247,8 +247,8 @@ class fisher (object):
 
 		cl21T = {}
 		cl21 = {}
-		"""
 		tag = "0"
+		"""
 		run_21cm (self.params_list, tag)
 		Cl = set_cl_21 (tag)
 		l_list = Cl.l_list	
