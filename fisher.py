@@ -229,7 +229,7 @@ class fisher (object):
 			"""
 			
 			infile1 = "params_" + param + "1.dat"
-			parmas_list_copy = np.loadtxt (infile1)[0:,]
+			params_list_copy = np.loadtxt (infile1)[0:,]
 			tag = param + "_01"
 			run_21cm (params_list_copy, tag)
 			Cl1 = set_cl_21 (tag)
