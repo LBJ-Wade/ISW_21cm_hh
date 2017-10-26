@@ -247,6 +247,7 @@ class fisher (object):
 
 		cl21T = {}
 		cl21 = {}
+		"""
 		tag = "0"
 		run_21cm (self.params_list, tag)
 		Cl = set_cl_21 (tag)
@@ -261,7 +262,13 @@ class fisher (object):
 		out_zm = path_result + '/cl21T_0.txt'
 		data = np.column_stack((self.l_list, cl21T_list[0], cl21T_list[1], cl21T_list[2], cl21T_list[3], cl21T_list[4], cl21T_list[5], cl21T_list[6], cl21T_list[7]))
 		np.savetxt(out_zm, data, fmt = '%1.6e')
-		
+		"""
+
+		out_zm = path_result + '/cl21T_0.txt'
+		for i in range(len(self.z_m_list)):
+			cl_zm = np.loadtxt (out_zm)[0:,i+1]
+			cl21T["{0}".format(i,i)] = cl_zm
+
 		for i in range(len(self.z_m_list)):
 			for j in range(len(self.z_m_list)):
 				if not j < i:
