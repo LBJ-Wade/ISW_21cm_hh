@@ -51,18 +51,18 @@ class cl_21 (object):
 		n_s = self.params_list[5]
 		k_pivot = 0.05
 		self.k_list = np.logspace (-4,5, 5000)
-		self.P_phi = As * (self.k_list/k_pivot)**(n_s-1) * 2*np.pi**2 / self.k_list**3
+		self.P_phi = As * (self.k_list/k_pivot)**(n_s-1.) * 2.*np.pi**2. / self.k_list**3.
 
-		a_0 = 10**-2/4
+		a_0 = 10.**-2./4.
 		n = 10000
 		scale_factor = np.logspace (np.log10(a_0), 0, n)
 		scale_factor_reverse = scale_factor[::-1]
-		self.redshift2 = 1/scale_factor_reverse - 1
+		self.redshift2 = 1./scale_factor_reverse - 1.
 		hubble_class2 = np.interp (self.redshift2, self.zlist2, self.hubble_class)
 
 		chi_class = []
 		for i in range(len(hubble_class2)):
-			chi_class.append (simps (1/hubble_class2[:i+1], self.redshift2[:i+1]))
+			chi_class.append (simps (1./hubble_class2[:i+1], self.redshift2[:i+1]))
 		chi_class = np.array (chi_class)
 		self.chi_class = np.interp (self.zlist2, self.redshift2, chi_class)
 		
@@ -71,36 +71,36 @@ class cl_21 (object):
 		self.x_HYREC = np.loadtxt(self.infile_HYREC)[0:,1]
 		Tm_Tr = np.loadtxt(self.infile_HYREC)[0:,2]
 		T_cmb = 2.7255
-		self.Tr = T_cmb*(1+self.z_HYREC)
+		self.Tr = T_cmb*(1.+self.z_HYREC)
 		self.Tm = self.Tr * Tm_Tr
 		self.T_T = None
 		self.T_H = None
 		self.T_b = None
 
-		self.c = 299792458
-		self.Mpc_to_m = 3.0857*10**22
+		self.c = 299792458.
+		self.Mpc_to_m = 3.0857*10.**22.
 		self.Yp = 0.245
 		self.Omega_b = self.params_list[1]
 		self.eV_to_m_inv = 5076142.131979696
 		#self.h = self.params_list[0]
 		self.h = 6.706290e-01
-		self.rho_cr = 8.056*10**-11 * self.h**2 # eV^4
-		self.mp = 938.2720813*10**6  #eV
-		self.me = 0.5109989461*10**6	#eV
-		self.sigma_T = 6.6524587158 * 10 **-29
-		self.J_to_eV = 6.2415093433*10**18
-		self.k_B = 8.613303*10**-5 # eV/K
+		self.rho_cr = 8.056*10.**-11. * self.h**2. # eV^4
+		self.mp = 938.2720813*10.**6.  #eV
+		self.me = 0.5109989461*10.**6.	#eV
+		self.sigma_T = 6.6524587158 * 10. **-29.
+		self.J_to_eV = 6.2415093433*10.**18.
+		self.k_B = 8.613303*10.**-5. # eV/K
 		self.wavelength = 0.21 #m
 		self.E10 = 0.068															# K
-		self.A10 = 2.85*10**-15 / self.c											# /m	
-		self.B10 = self.A10*(1+1/(np.e**(self.E10/self.Tr)-1))							# /m
+		self.A10 = 2.85*10.**-15. / self.c											# /m	
+		self.B10 = self.A10*(1.+1./(np.e**(self.E10/self.Tr)-1.))							# /m
 		
 		l_list = np.logspace(np.log10(2), np.log10(5000), 500)
 		#l_list = np.logspace(np.log10(2), np.log10(10), 2)
 		for i in range(len(l_list)):
 			l_list[i] = int(l_list[i])
 		l_list = sorted(set(l_list))
-		l_list[-1] += 1
+		l_list[-1] += 1.
 		self.l_list = np.array (l_list)
 
 
@@ -234,7 +234,7 @@ class cl_21 (object):
 		cl_list = []
 		for l in self.l_list:
 			print (l)
-			kk = (l+1/2)/chi_class_local
+			kk = (l+1./2.)/chi_class_local
 			P_phi_local = np.interp (kk, self.k_list, self.P_phi)
 			
 			transfer_21 = []
@@ -308,7 +308,7 @@ class cl_21 (object):
 		cl_list = []
 		for l in self.l_list:
 			print (l)
-			kk = (l+1/2)/chi_class_local
+			kk = (l+1./2.)/chi_class_local
 			P_phi_local = np.interp (kk, self.k_list, self.P_phi)
 			
 			transfer_21 = []
@@ -318,7 +318,7 @@ class cl_21 (object):
 				transfer_21.append (T*bb)
 			transfer_21 = np.array (transfer_21)
 	
-			integrand = 2*np.pi**2/l**3 * kk**3*P_phi_local/(2*np.pi**2) * sel1 * sel2 * transfer_21**2 * chi_class_local * hubble_local
+			integrand = 2.*np.pi**2/l**3 * kk**3*P_phi_local/(2*np.pi**2) * sel1 * sel2 * transfer_21**2 * chi_class_local * hubble_local
 			cl = simps (integrand, z)
 			cl_list.append (cl)
 	
