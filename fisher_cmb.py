@@ -13,6 +13,6 @@ inv_fisher = inv(fisher_matrix)
 sigma = []
 for i in range(len(fisher_matrix)):
 	sigma.append (np.sqrt(inv_fisher[i,i]))
-	sigma = np.array(sigma)
+sigma = np.array(sigma)
 data = np.column_stack((sigma))
 np.savetxt('sigma.txt', data, fmt = '%1.6e')
