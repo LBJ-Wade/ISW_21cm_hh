@@ -194,8 +194,8 @@ class fisher (object):
 		""" Construct vector of derivative of cl21T w.r.t each parameter"""
 		
 		for j in range(len(self.fisher_params)):
-			
 			param = self.fisher_params[j]
+			"""
 			stepsize = self.stepsize[j]
 			params_list_copy = self.params_list.copy ()
 			if param == 'Neff':
@@ -234,7 +234,12 @@ class fisher (object):
 			out_zm = path_result + '/cl21T_deriv_'+param+'.txt'
 			data = np.column_stack((self.l_list, dev_list[0], dev_list[1], dev_list[2], dev_list[3], dev_list[4], dev_list[5], dev_list[6], dev_list[7]))
 			np.savetxt(out_zm, data, fmt = '%1.6e')
-			
+			"""
+			out_zm = path_result + '/cl21T_deriv_'+param+'.txt'
+			dev_cl = {}
+			for k in range(8):
+				dev_cl_zm = np.loadtxt(out_zm)[0:,k+1]
+				dev_cl['{0}'.format (self.z_m_list[k])] = dev_cl_zm
 			self.deriv_vec[param] = dev_cl
 			
 	def cov_matrix (self):
@@ -260,6 +265,7 @@ class fisher (object):
 		for i in range(len(self.z_m_list)):
 			for j in range(len(self.z_m_list)):
 				if not j < i:
+					"""
 					zm = [self.z_m_list[i], self.z_m_list[j]]
 					w = [self.w_list[i], self.w_list[j]]
 					cl_zmzl = Cl.cl21 (zm, w)
@@ -272,10 +278,18 @@ class fisher (object):
 					out_zm = path_result + '/cl21zmzl_{0}{1}.txt'.format(i,j)
 					data = np.column_stack((self.l_list, cl_zmzl))
 					np.savetxt(out_zm, data, fmt = '%1.6e')
-		
+					"""
+					out_zm = path_result + '/cl21zmzl_{0}{1}.txt'.format(i,j)
+					cl_zmzl = np.loadtxt(out_zm)[0:,1]
+					if i == j:
+						cl21["{0}{1}".format(i,j)] = cl_zmzl
+					else:
+						cl21["{0}{1}".format(i,j)] = cl_zmzl
+						cl21["{0}{1}".format(j,i)] = cl_zmzl
+
 		cl_out = path_result + "/cl_" + tag + ".dat"
 		l = np.loadtxt(cl_out)[0:,0]
-		aa = 2.7255**2 * 2*np.pi / (l*(l+1))
+		aa = 10**-6 * 2*np.pi / (l*(l+1))
 		cl = np.loadtxt(cl_out)[0:,1]*aa
 		clTT = np.interp (self.l_list, l, cl)
 		for i in range(len(self.z_m_list)):
