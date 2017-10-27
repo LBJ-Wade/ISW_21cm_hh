@@ -48,6 +48,7 @@ class cl_21 (object):
 		self.baryon_dot = -np.loadtxt(self.infile_syn)[0:,3]
 
 		As = self.params_list[4]
+		print(As)
 		n_s = self.params_list[5]
 		k_pivot = 0.05
 		self.k_list = np.logspace (-4,5, 5000)

@@ -23,7 +23,7 @@ def run_cmb (params_list, tag):
 	
 	return clout
 
-def run_21cm (params_list, tag, cross = True):
+def run_21cm (params_list, params_input, tag, cross = True):
 	
 	
 	#Delete unnecessary output file in CLASS
