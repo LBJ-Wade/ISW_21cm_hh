@@ -183,7 +183,8 @@ class prior_cmb (object):		# Need to add cl^dd
 
 class fisher (object): 
 	def __init__ (self):
-		
+	
+		params_input = "params_nonu.dat"
 		self.params_list = np.loadtxt (params_input)[0:,]
 		
 		self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.1e-9, 0.01, 0.02/3, [0.7117357, 0.721146] ]
