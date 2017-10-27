@@ -4,8 +4,9 @@ from cl_21 import *
 
 class prior_cmb (object):		# Need to add cl^dd
 	def __init__ (self):
+		self.params_input = "params_nonu.dat"
 		self.stepsize = [0.0030, 8.0e-4, 5.0e-3, 0.02, 0.1e-9, 0.01, 0.02/3, [0.7117357, 0.721146] ]
-		self.params_list = np.loadtxt (params_input)[0:,]
+		self.params_list = np.loadtxt (self.params_input)[0:,]
 		self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
 		self.deriv_vec = {}
 		self.cov = {}
@@ -18,7 +19,7 @@ class prior_cmb (object):		# Need to add cl^dd
 			param = self.fisher_params[j]
 			stepsize = self.stepsize[j]
 		
-				
+			"""	
 			params_list_copy = self.params_list.copy ()
 			if param == 'Neff':
 				params_list_copy[j] = stepsize[0]
@@ -34,7 +35,18 @@ class prior_cmb (object):		# Need to add cl^dd
 				params_list_copy[j] += stepsize
 			tag = param + "2"
 			outfile2 = run_cmb (params_list_copy, tag)
-			
+			"""
+
+			infile1 = "params_" + param + "1.dat"
+			params_list_copy = np.loadtxt (infile1)[0:,]
+			tag = param + "1"
+			outfile1 = run_cmb (params_list_copy,  tag)
+
+			infile2 = "params_" + param + "2.dat"
+			params_list_copy = np.loadtxt (infile2)[0:,] 
+			tag = param + "2"
+			outfile2 = run_cmb (params_list_copy, tag)
+		
 
 			#outfile1 = path_data + "/cl_" + param+"1" + ".dat"
 			#outfile2 = path_data + "/cl_" + param+"2" + ".dat"
