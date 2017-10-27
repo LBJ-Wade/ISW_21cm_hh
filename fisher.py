@@ -136,34 +136,34 @@ class prior_cmb (object):		# Need to add cl^dd
 				param_m = self.fisher_params[m]
 				param_n = self.fisher_params[n]
 					
-				for l in range(2971):
+				for ll in range(2971):
 					vec_m = np.zeros(4)
 					vec_n = np.zeros(4)
 					inv_cov = np.zeros([4,4])
 					for i in range(4):
 						for j in range(4):
 							if i == 0:
-								vec_m[i] = self.deriv_vec[param_m]["TT"][l]
+								vec_m[i] = self.deriv_vec[param_m]["TT"][ll]
 							elif i == 1:
-								vec_m[i] = self.deriv_vec[param_m]["TE"][l]
+								vec_m[i] = self.deriv_vec[param_m]["TE"][ll]
 							elif i == 2:
-								vec_m[i] = self.deriv_vec[param_m]["EE"][l]
+								vec_m[i] = self.deriv_vec[param_m]["EE"][ll]
 							elif i == 3:
-								vec_m[i] = self.deriv_vec[param_m]["dd"][l]
+								vec_m[i] = self.deriv_vec[param_m]["dd"][ll]
 							
 							if j == 0:
-								vec_n[j] = self.deriv_vec[param_n]["TT"][l]
+								vec_n[j] = self.deriv_vec[param_n]["TT"][ll]
 							elif j == 1:
-								vec_n[j] = self.deriv_vec[param_n]["TE"][l]
+								vec_n[j] = self.deriv_vec[param_n]["TE"][ll]
 							elif j == 2:
-								vec_n[j] = self.deriv_vec[param_n]["EE"][l]
+								vec_n[j] = self.deriv_vec[param_n]["EE"][ll]
 							elif j == 3:
-								vec_n[j] = self.deriv_vec[param_n]["dd"][l]
+								vec_n[j] = self.deriv_vec[param_n]["dd"][ll]
 							
-							inv_cov[i,j] = self.cov["{0}{1}".format(i+1,j+1)][l]
+							inv_cov[i,j] = self.cov["{0}{1}".format(i+1,j+1)][ll]
 					inv_cov = inv(inv_cov)
 					F_mn += np.dot(vec_m, np.dot(inv_cov, vec_n))
-				for l in range(2971,len(self.l_list)):
+				for ll in range(2971,len(self.l_list)):
 					vec_m = np.zeros(3)
 					vec_n = np.zeros(3)
 					inv_cov = np.zeros([3,3])
@@ -171,20 +171,20 @@ class prior_cmb (object):		# Need to add cl^dd
 					for i in range(3):
 						for j in range(3):
 							if i == 0:
-								vec_m[i] = self.deriv_vec[param_m]["TE"][l]
+								vec_m[i] = self.deriv_vec[param_m]["TE"][ll]
 							elif i == 1:
-								vec_m[i] = self.deriv_vec[param_m]["EE"][l]
+								vec_m[i] = self.deriv_vec[param_m]["EE"][ll]
 							elif i == 2:
-								vec_m[i] = self.deriv_vec[param_m]["dd"][l]
+								vec_m[i] = self.deriv_vec[param_m]["dd"][ll]
 							
 							if j == 0:
-								vec_n[j] = self.deriv_vec[param_n]["TE"][l]
+								vec_n[j] = self.deriv_vec[param_n]["TE"][ll]
 							elif j == 1:
-								vec_n[j] = self.deriv_vec[param_n]["EE"][l]
+								vec_n[j] = self.deriv_vec[param_n]["EE"][ll]
 							elif j == 2:
-								vec_n[j] = self.deriv_vec[param_n]["dd"][l]
+								vec_n[j] = self.deriv_vec[param_n]["dd"][ll]
 				
-							inv_cov[i,j] = self.cov["{0}{1}".format(i+2,j+2)][l]
+							inv_cov[i,j] = self.cov["{0}{1}".format(i+2,j+2)][ll]
 					inv_cov = inv(inv_cov)
 					F_mn += np.dot(vec_m, np.dot(inv_cov, vec_n))
 				F[m,n] = F_mn
@@ -335,7 +335,7 @@ class fisher (object):
 
 		cl_out = path_result + "/cl_" + tag + ".dat"
 		l = np.loadtxt(cl_out)[0:,0]
-		aa = 2.7255*10**-12 * 2*np.pi / (l*(l+1))
+		aa = 10**-12 * 2*np.pi / (l*(l+1))/2.7255
 		cl = np.loadtxt(cl_out)[0:,1]*aa
 		clTT = np.interp (self.l_list, l, cl)
 		for i in range(len(self.z_m_list)):
