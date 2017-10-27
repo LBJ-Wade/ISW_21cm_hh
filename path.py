@@ -4,5 +4,5 @@ path_CLASS_new = default + "/class_new"
 path_HYREC = default + "/HyRec"
 path_result = default + "/result"
 path_data = default + "/data"
-params_input = default + "/params_nonu.dat"
+#params_input = default + "/params_nonu.dat"
 
