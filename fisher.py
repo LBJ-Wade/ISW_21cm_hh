@@ -184,8 +184,8 @@ class prior_cmb (object):		# Need to add cl^dd
 class fisher (object): 
 	def __init__ (self):
 	
-		params_input = "params_nonu.dat"
-		self.params_list = np.loadtxt (params_input)[0:,]
+		self.params_input = "params_nonu.dat"
+		self.params_list = np.loadtxt (self.params_input)[0:,]
 		
 		self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.1e-9, 0.01, 0.02/3, [0.7117357, 0.721146] ]
 		self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
@@ -232,7 +232,7 @@ class fisher (object):
 			infile1 = "params_" + param + "1.dat"
 			params_list_copy = np.loadtxt (infile1)[0:,]
 			tag = param + "_01"
-			run_21cm (params_list_copy, tag)
+			run_21cm (params_list_copy, infile1, tag)
 			Cl1 = set_cl_21 (tag)
 			if j == 0:
 				l_list = Cl1.l_list
@@ -240,7 +240,7 @@ class fisher (object):
 			infile2 = "params_" + param + "2.dat"
 			params_list_copy = np.loadtxt (infile2)[0:,] 
 			tag = param + "_02"
-			run_21cm (params_list_copy, tag)
+			run_21cm (params_list_copy, infile2, tag)
 			Cl2 = set_cl_21 (tag)
 			
 			dev_cl = {}
@@ -276,7 +276,7 @@ class fisher (object):
 		cl21 = {}
 		tag = "0"
 		
-		run_21cm (self.params_list, tag)
+		run_21cm (self.params_list, self.params_input, tag)
 		Cl = set_cl_21 (tag)
 		l_list = Cl.l_list	
 		cl21T_list = []
