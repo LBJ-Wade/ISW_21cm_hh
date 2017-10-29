@@ -19,7 +19,7 @@ class prior_cmb (object):		# Need to add cl^dd
 			param = self.fisher_params[j]
 			stepsize = self.stepsize[j]
 		
-			""""
+						
 			infile1 = "params_" + param + "1.dat"
 			params_list_copy = np.loadtxt (infile1)[0:,]
 			tag = param + "1"
@@ -29,10 +29,10 @@ class prior_cmb (object):		# Need to add cl^dd
 			params_list_copy = np.loadtxt (infile2)[0:,] 
 			tag = param + "2"
 			outfile2 = run_cmb (params_list_copy, tag)
-			"""
+			
 
-			outfile1 = path_data + "/cl_" + param+"1" + ".dat"
-			outfile2 = path_data + "/cl_" + param+"2" + ".dat"
+			#outfile1 = path_data + "/cl_" + param+"1" + ".dat"
+			#outfile2 = path_data + "/cl_" + param+"2" + ".dat"
 			dev_cl = {}
 			l = np.loadtxt (outfile1)[28:,0]
 			clTT1 = np.loadtxt (outfile1)[28:,1] / (l*(l+1)/(2*np.pi)) 
@@ -77,8 +77,8 @@ class prior_cmb (object):		# Need to add cl^dd
 		f_sky = 0.7	
 		cov = {}
 		tag = "0"
-		#outfile = run_cmb (self.params_list, tag)
-		outfile = path_data + "/cl_" + tag + ".dat"
+		outfile = run_cmb (self.params_list, tag)
+		#outfile = path_data + "/cl_" + tag + ".dat"
 		l = np.loadtxt (outfile)[28:,0]
 		clTT_N = (2*0.000290888)**2 *np.e**(l*(l+1)*(0.000290888**2)/(8*np.log(2)))
 		clEE_N = 2*clTT_N
@@ -304,10 +304,12 @@ class fisher (object):
 		aa = 10**-12 * 2*np.pi / (l*(l+1))/2.7255**2
 		cl = np.loadtxt(cl_out)[0:,1]*aa
 		clTT = np.interp (self.l_list, l, cl)
-		clTT_N = (2*0.000290888)**2 *np.e**(self.l_list*(self.l_list+1)*(0.000290888**2)/(8*np.log(2)))/2.7255**2
+		clTT_N = (2*10**-6*0.000290888)**2 *np.e**(self.l_list*(self.l_list+1)*(0.000290888**2)/(8*np.log(2)))/2.7255**2
 		plt.figure(1)
-		plt.loglog (self.l_list, clTT)
-		plt.loglog (self.l_list, clTT_N)
+		plt.plot (self.l_list, self.l_list*(self.l_list+1)*clTT/(2*np.pi))
+		plt.plot (self.l_list, self.l_list*(self.l_list+1)*clTT_N/(2*np.pi))
+		plt.xscale('log')
+		plt.yscale('log')
 		#clTT += clTT_N
 		for i in range(len(self.z_m_list)):
 			for j in range(len(self.z_m_list)):
@@ -324,7 +326,7 @@ class fisher (object):
 				F_mn = 0
 				param_m = self.fisher_params[m]
 				param_n = self.fisher_params[n]
-				for l in range(2998):#range(len(self.l_list)):
+				for l in range(len(self.l_list)):
 					vec_m = np.zeros(len(self.z_m_list))
 					vec_n = np.zeros(len(self.z_m_list))
 					inv_cov = np.zeros([len(self.z_m_list), len(self.z_m_list)])
