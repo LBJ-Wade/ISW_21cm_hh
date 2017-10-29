@@ -203,6 +203,7 @@ class fisher (object):
 			param = self.fisher_params[j]
 			stepsize = self.stepsize[j]
 			
+			"""
 			infile1 = "params_" + param + "1.dat"
 			params_list_copy = np.loadtxt (infile1)[0:,]
 			tag = param + "_01"
@@ -211,7 +212,6 @@ class fisher (object):
 			if j == 0:
 				l_list = Cl1.l_list
 
-			"""
 			infile2 = "params_" + param + "2.dat"
 			params_list_copy = np.loadtxt (infile2)[0:,] 
 			tag = param + "_02"
