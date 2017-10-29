@@ -301,9 +301,14 @@ class fisher (object):
 
 		cl_out = path_result + "/cl_" + tag + ".dat"
 		l = np.loadtxt(cl_out)[0:,0]
-		aa = 10**-12 * 2*np.pi / (l*(l+1))/2.7255
+		aa = 10**-12 * 2*np.pi / (l*(l+1))/2.7255**2
 		cl = np.loadtxt(cl_out)[0:,1]*aa
 		clTT = np.interp (self.l_list, l, cl)
+		clTT_N = (2*0.000290888)**2 *np.e**(self.l_list*(self.l_list+1)*(0.000290888**2)/(8*np.log(2)))/2.7255**2
+		plt.figure(1)
+		plt.loglog (self.l_list, clTT)
+		plt.loglog (self.l_list, clTT_N)
+		#clTT += clTT_N
 		for i in range(len(self.z_m_list)):
 			for j in range(len(self.z_m_list)):
 				element_ij = (cl21["{0}{1}".format(i,j)] * clTT + cl21T["{0}".format(i)]*cl21T["{0}".format(j)]) / (2*self.l_list+1)
@@ -319,7 +324,7 @@ class fisher (object):
 				F_mn = 0
 				param_m = self.fisher_params[m]
 				param_n = self.fisher_params[n]
-				for l in range(len(self.l_list)):
+				for l in range(2998):#range(len(self.l_list)):
 					vec_m = np.zeros(len(self.z_m_list))
 					vec_n = np.zeros(len(self.z_m_list))
 					inv_cov = np.zeros([len(self.z_m_list), len(self.z_m_list)])
