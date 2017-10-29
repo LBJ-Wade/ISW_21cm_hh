@@ -198,6 +198,7 @@ class fisher (object):
 		self.l_list = np.arange(2,5001)
 	def cl21T_deriv_vec (self):
 		""" Construct vector of derivative of cl21T w.r.t each parameter"""
+		print ('Start cl21T_deriv_vec')
 		
 		for j in range(len(self.fisher_params)):
 			param = self.fisher_params[j]
@@ -245,6 +246,7 @@ class fisher (object):
 			
 	def cov_matrix (self):
 		""" Construct covariance matrix """
+		print ('Start cov_matrix')
 
 		cl21T = {}
 		cl21 = {}
@@ -309,6 +311,7 @@ class fisher (object):
 		
 	def fisher_analysis (self):
 		""" Do fisher analysis with results from deriv_vec (self) and cov_matrix (self) """
+		print ('Start cl21T fisher_analysis')
 		
 		F = np.zeros([len(self.fisher_params),len(self.fisher_params)])
 		for m in range(len(self.fisher_params)):
