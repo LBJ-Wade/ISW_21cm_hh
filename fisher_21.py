@@ -16,3 +16,4 @@ for i in range(len(fisher_matrix)):
 sigma = np.array(sigma)
 data = np.column_stack((sigma))
 np.savetxt('sigma_cl21T.txt', data, fmt = '%1.6e')
+plt.show()
