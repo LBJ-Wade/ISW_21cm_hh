@@ -19,7 +19,7 @@ class prior_cmb (object):		# Need to add cl^dd
 			param = self.fisher_params[j]
 			stepsize = self.stepsize[j]
 		
-						
+			"""	
 			infile1 = "params_" + param + "1.dat"
 			params_list_copy = np.loadtxt (infile1)[0:,]
 			tag = param + "1"
@@ -29,10 +29,10 @@ class prior_cmb (object):		# Need to add cl^dd
 			params_list_copy = np.loadtxt (infile2)[0:,] 
 			tag = param + "2"
 			outfile2 = run_cmb (params_list_copy, tag)
-			
+			"""
 
-			#outfile1 = path_data + "/cl_" + param+"1" + ".dat"
-			#outfile2 = path_data + "/cl_" + param+"2" + ".dat"
+			outfile1 = path_data + "/cl_" + param+"1" + ".dat"
+			outfile2 = path_data + "/cl_" + param+"2" + ".dat"
 			dev_cl = {}
 			l = np.loadtxt (outfile1)[28:,0]
 			clTT1 = np.loadtxt (outfile1)[28:,1] / (l*(l+1)/(2*np.pi)) 
@@ -77,12 +77,13 @@ class prior_cmb (object):		# Need to add cl^dd
 		f_sky = 0.7	
 		cov = {}
 		tag = "0"
-		outfile = run_cmb (self.params_list, tag)
-		#outfile = path_data + "/cl_" + tag + ".dat"
+		#outfile = run_cmb (self.params_list, tag)
+		outfile = path_data + "/cl_" + tag + ".dat"
 		l = np.loadtxt (outfile)[28:,0]
 		clTT_N = (2*0.000290888)**2 *np.e**(l*(l+1)*(0.000290888**2)/(8*np.log(2)))
 		clEE_N = 2*clTT_N
 		self.l_list = l
+		
 		clTT = np.loadtxt (outfile)[28:,1] / (l*(l+1)/(2*np.pi)) 
 		clTT += clTT_N
 		clTE = np.loadtxt (outfile)[28:,4] / (l*(l+1)/(2*np.pi)) 
@@ -92,19 +93,19 @@ class prior_cmb (object):		# Need to add cl^dd
 		clTd = np.loadtxt (outfile)[28:,6] / (l*(l+1)/(2*np.pi))
 		clEd = np.loadtxt (outfile)[28:,7] / (l*(l+1)/(2*np.pi))
 		
-		cov['11'] = f_sky * 2 * clTT**2 / (2*l+1)
-		cov['22'] = f_sky * (clTT*clEE + clTE**2) / (2*l+1)
-		cov['33'] = f_sky * 2 * clEE**2 / (2*l+1)
-		cov['44'] = f_sky * 2 * cldd**2 / (2*l+1)
+		cov['11'] = 2 * clTT**2 / (2*l+1) /f_sky
+		cov['22'] = (clTT*clEE + clTE**2) / (2*l+1) /f_sky
+		cov['33'] = 2 * clEE**2 / (2*l+1) /f_sky
+		cov['44'] = 2 * cldd**2 / (2*l+1) /f_sky
 
-		cov['12'] = f_sky * 2 * clTT*clTE / (2*l+1); cov['21'] = f_sky * 2 * clTT*clTE / (2*l+1)
-		cov['13'] = f_sky * 2 * clTE**2	/ (2*l+1); cov['31'] = f_sky * 2 * clTE**2	/ (2*l+1)
-		cov['14'] = f_sky * 2 * clTd**2 / (2*l+1); cov['41'] = f_sky * 2 * clTd**2 / (2*l+1)
+		cov['12'] = 2 * clTT*clTE / (2*l+1) /f_sky; cov['21'] = 2 * clTT*clTE / (2*l+1) /f_sky
+		cov['13'] = 2 * clTE**2	/ (2*l+1) /f_sky; cov['31'] = 2 * clTE**2	/ (2*l+1) /f_sky
+		cov['14'] = 2 * clTd**2 / (2*l+1) /f_sky; cov['41'] = 2 * clTd**2 / (2*l+1) /f_sky
+
+		cov['23'] = 2 * clTE*clEE / (2*l+1) /f_sky; cov['32'] = 2 * clTE*clEE / (2*l+1) /f_sky
+		cov['24'] = 2 * clTd*clEd / (2*l+1) /f_sky; cov['42'] = 2 * clTd*clEd / (2*l+1) /f_sky
 		
-		cov['23'] = f_sky * 2 * clTE*clEE / (2*l+1); cov['32'] = f_sky * 2 * clTE*clEE / (2*l+1)
-		cov['24'] = f_sky * 2 * clTd*clEd / (2*l+1); cov['42'] = f_sky * 2 * clTd*clEd / (2*l+1)
-		
-		cov['34'] = f_sky * 2 * clEd**2 / (2*l+1); cov['43'] = f_sky * 2 * clEd**2 / (2*l+1)
+		cov['34'] = 2 * clEd**2 / (2*l+1) /f_sky; cov['43'] = 2 * clEd**2 / (2*l+1) /f_sky
 
 		self.cov = cov
 		
@@ -188,7 +189,6 @@ class fisher (object):
 		#self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.02/3, [0.7117357, 0.721146] ]
 		#self.fisher_params = ['c','b','theta','tau', 'm_nu','Neff']
 		
-		#self.z_m_list = [30, 50]
 		self.z_m_list = [30, 50,75,100,125,150,175,200]
 		#self.w_list = [3.31685, 2.47355]
 		self.w_list = [3.31685, 2.47355 ,1.93014, 1.60434, 1.38246, 1.21989, 1.09467, 1]
@@ -239,15 +239,15 @@ class fisher (object):
 			"""
 			out_zm = path_result + '/cl21T_deriv_'+param+'.txt'
 			dev_cl = {}
-			for k in range(8):
-				dev_cl_zm = np.loadtxt(out_zm)[0:,k+1]
+			for k in range(len(self.z_m_list)):
+				dev_cl_zm = np.loadtxt(out_zm)[0:,k+1] *2.7255
 				dev_cl['{0}'.format (self.z_m_list[k])] = dev_cl_zm
 			self.deriv_vec[param] = dev_cl
 			
 	def cov_matrix (self):
 		""" Construct covariance matrix """
 		print ('Start cov_matrix')
-
+		f_sky = 0.7
 		cl21T = {}
 		cl21 = {}
 		tag = "0"
@@ -270,7 +270,7 @@ class fisher (object):
 
 		out_zm = path_result + '/cl21T_0.txt'
 		for i in range(len(self.z_m_list)):
-			cl_zm = np.loadtxt (out_zm)[0:,i+1]
+			cl_zm = np.loadtxt (out_zm)[0:,i+1] *2.7255
 			cl21T["{0}".format(i,i)] = cl_zm
 
 		for i in range(len(self.z_m_list)):
@@ -301,19 +301,19 @@ class fisher (object):
 
 		cl_out = path_result + "/cl_" + tag + ".dat"
 		l = np.loadtxt(cl_out)[0:,0]
-		aa = 10**-12 * 2*np.pi / (l*(l+1))/2.7255**2
+		aa = 10**-12 * 2*np.pi / (l*(l+1))#/2.7255**2
 		cl = np.loadtxt(cl_out)[0:,1]*aa
 		clTT = np.interp (self.l_list, l, cl)
-		clTT_N = (2*10**-6*0.000290888)**2 *np.e**(self.l_list*(self.l_list+1)*(0.000290888**2)/(8*np.log(2)))/2.7255**2
-		plt.figure(1)
-		plt.plot (self.l_list, self.l_list*(self.l_list+1)*clTT/(2*np.pi))
-		plt.plot (self.l_list, self.l_list*(self.l_list+1)*clTT_N/(2*np.pi))
-		plt.xscale('log')
-		plt.yscale('log')
-		#clTT += clTT_N
+		clTT_N = (2*10**-6*0.000290888)**2 *np.e**(self.l_list*(self.l_list+1)*(0.000290888**2)/(8*np.log(2)))#/2.7255**2
+		#plt.figure(1)
+		#plt.plot (self.l_list, self.l_list*(self.l_list+1)*clTT/(2*np.pi))
+		#plt.plot (self.l_list, self.l_list*(self.l_list+1)*clTT_N/(2*np.pi))
+		#plt.xscale('log')
+		#plt.yscale('log')
+		clTT += clTT_N
 		for i in range(len(self.z_m_list)):
 			for j in range(len(self.z_m_list)):
-				element_ij = (cl21["{0}{1}".format(i,j)] * clTT + cl21T["{0}".format(i)]*cl21T["{0}".format(j)]) / (2*self.l_list+1)
+				element_ij = (cl21["{0}{1}".format(i,j)] * clTT + cl21T["{0}".format(i)]*cl21T["{0}".format(j)]) / (2*self.l_list+1)/f_sky
 				self.cov["{0}{1}".format(i,j)] = element_ij
 		
 	def fisher_analysis (self):
@@ -326,7 +326,7 @@ class fisher (object):
 				F_mn = 0
 				param_m = self.fisher_params[m]
 				param_n = self.fisher_params[n]
-				for l in range(len(self.l_list)):
+				for l in range(28,2999):#len(self.l_list)):
 					vec_m = np.zeros(len(self.z_m_list))
 					vec_n = np.zeros(len(self.z_m_list))
 					inv_cov = np.zeros([len(self.z_m_list), len(self.z_m_list)])
@@ -335,8 +335,14 @@ class fisher (object):
 							vec_m[i] = self.deriv_vec[param_m]["{0}".format(self.z_m_list[i])][l]
 							vec_n[j] = self.deriv_vec[param_n]["{0}".format(self.z_m_list[j])][l]
 							inv_cov[i,j] = self.cov["{0}{1}".format(i,j)][l]
+							#vec_m = self.deriv_vec[param_m]["{0}".format(self.z_m_list[i])][l]
+							#vec_n = self.deriv_vec[param_n]["{0}".format(self.z_m_list[j])][l]
+							#inv_cov = self.cov["{0}{1}".format(i,j)][l]
+						
 					inv_cov = inv(inv_cov)
 					F_mn += np.dot (vec_m, np.dot (inv_cov ,vec_n))
+					#inv_cov = 1/inv_cov
+					#F_mn += vec_m*inv_cov*vec_n
 				F[m,n] = F_mn
 		return F
 
