@@ -47,7 +47,7 @@ class cl_21 (object):
 		self.baryon = -np.loadtxt(self.infile_syn)[0:,2]
 		self.baryon_dot = -np.loadtxt(self.infile_syn)[0:,3]
 
-		As = self.params_list[4]
+		As = (np.e**self.params_list[4])*10**(-10)
 		print(As)
 		n_s = self.params_list[5]
 		k_pivot = 0.05
