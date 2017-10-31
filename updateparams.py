@@ -22,8 +22,8 @@ def setparamsfile_CLASS (params_list, pfilename, pnewfilename):
 				file.write ('\n')
 				print (line, '-> {0}'.format (params_list[3]))
 			
-			elif line.startswith ('A_s'):
-				file.write (line.replace (line, 'A_s = {0}' .format (params_list[4])))
+			elif line.startswith ('ln10'):
+				file.write (line.replace (line, line[:12]+' = {0}' .format (params_list[4])))
 				file.write ('\n')
 				print (line, '-> {0}'.format (params_list[4]))
 			
@@ -37,11 +37,16 @@ def setparamsfile_CLASS (params_list, pfilename, pnewfilename):
 				file.write ('\n')
 				print (line, '-> {0}'.format (params_list[6]))
 			
-			elif line.startswith ('T_ncdm'):
-				file.write (line.replace (line, 'T_ncdm = {0}' .format (params_list[7])))
+			#elif line.startswith ('T_ncdm'):
+				#file.write (line.replace (line, 'T_ncdm = {0}' .format (params_list[7])))
+				#file.write ('\n')
+				#print (line, '-> {0}'.format (params_list[7]))
+			
+			elif line.startswith ('N_ur'):
+				file.write (line.replace (line, 'N_ur = {0}' .format (params_list[7])))
 				file.write ('\n')
 				print (line, '-> {0}'.format (params_list[7]))
-			
+		
 			else:
 				print (line)
 				file.write(line)
