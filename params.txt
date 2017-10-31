@@ -2,9 +2,9 @@ Omega_cdm*h^2
 Omega_b*h^2
 100*theta_s
 tau_reio
-A_s
+ln10^{10}A_s
 n_s
 m_ncdm
-T_ncdm
+N_ur
 Omega_Lambda*h^2
-N_eff
+h
