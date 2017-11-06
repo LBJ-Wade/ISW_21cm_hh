@@ -46,6 +46,14 @@ def setparamsfile_CLASS (params_list, pfilename, pnewfilename):
 				file.write (line.replace (line, 'N_ur = {0}' .format (params_list[7])))
 				file.write ('\n')
 				print (line, '-> {0}'.format (params_list[7]))
+			
+			elif line.startswith ('YHe'):
+				w = params_list[1]
+				dN = params_list[9] - 3.046
+				y = 0.2311 + 0.9502*w - 11.27*w**2 + dN*(0.01356 + 0.008581*w - 0.1810*w**2) + dN**2 * (-0.0009795 - 0.001370*w + 0.01746*w**2)
+				file.write (line.replace (line, 'YHe = {0}' .format (y)))
+				file.write ('\n')
+				print (line, '-> {0}'.format (y))
 		
 			else:
 				print (line)
