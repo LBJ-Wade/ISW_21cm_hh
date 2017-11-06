@@ -189,7 +189,7 @@ class fisher (object):
 			param = self.fisher_params[j]
 			stepsize = self.stepsize[j]
 			
-			"""	
+				
 			infile1 = "params_" + param + "1.dat"
 			params_list_copy = np.loadtxt (infile1)[0:,]
 			tag = param + "_01"
@@ -219,15 +219,15 @@ class fisher (object):
 			out_zm = path_result + '/cl21T_deriv_'+param+'.txt'
 			data = np.column_stack((self.l_list, dev_list[0], dev_list[1], dev_list[2], dev_list[3], dev_list[4], dev_list[5], dev_list[6], dev_list[7]))
 			np.savetxt(out_zm, data, fmt = '%1.6e')
-			"""
 			
 			
+			"""	
 			out_zm = path_result + '/cl21T_deriv_'+param+'.txt'
 			dev_cl = {}
 			for k in range(len(self.z_m_list)):
 				dev_cl_zm = np.loadtxt(out_zm)[0:,k+1] *2.7255
 				dev_cl['{0}'.format (self.z_m_list[k])] = dev_cl_zm
-			
+			"""
 			self.deriv_vec[param] = dev_cl
 			
 	def cov_matrix (self):
@@ -239,7 +239,6 @@ class fisher (object):
 		tag = "0"
 
 		
-		"""
 		run_21cm (self.params_list, self.params_input, tag)
 		Cl = set_cl_21 (tag)
 		l_list = Cl.l_list	
@@ -259,13 +258,14 @@ class fisher (object):
 		for i in range(len(self.z_m_list)):
 			cl_zm = np.loadtxt (out_zm)[0:,i+1] *2.7255
 			cl21T["{0}".format(i,i)] = cl_zm
+		"""
 		
 		for i in range(len(self.z_m_list)):
 			for j in range(len(self.z_m_list)):
 				if not j < i:
 					zm = [self.z_m_list[i], self.z_m_list[j]]
 					w = [self.w_list[i], self.w_list[j]]
-					"""
+					
 					cl_zmzl = Cl.cl21 (zm, w)
 					cl_zmzl = np.interp (self.l_list, l_list, cl_zmzl)
 					if i == j:
@@ -284,7 +284,7 @@ class fisher (object):
 					else:
 						cl21["{0}{1}".format(i,j)] = cl_zmzl
 						cl21["{0}{1}".format(j,i)] = cl_zmzl
-					
+					"""
 
 		cl_out = path_result + "/cl_" + tag + ".dat"
 		l = np.loadtxt(cl_out)[0:,0]
