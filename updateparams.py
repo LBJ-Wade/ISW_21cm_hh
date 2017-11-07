@@ -82,6 +82,14 @@ def setparamsfile_HYREC (params_list, pfilename, pnewfilename):
 				file.write (lines[i].replace (lines[i], '{0}' .format (new)))
 				file.write ('\n')
 				print (old, '-> {0}'.format (new))
+			elif i == 6:
+				old = lines[i]
+				w = params_list[1]
+				dN = params_list[9] - 3.046
+				new = 0.2311 + 0.9502*w - 11.27*w**2 + dN*(0.01356 + 0.008581*w - 0.1810*w**2) + dN**2 * (-0.0009795 - 0.001370*w + 0.01746*w**2)
+				file.write (lines[i].replace (lines[i], '{0}' .format (new)))
+				file.write ('\n')	
+				print (old, '-> {0}'.format (new))
 			elif i == 7:
 				if not params_list[9] == 3.046:
 					old = lines[i]
