@@ -2795,6 +2795,7 @@ int thermodynamics_recombination_with_hyrec(
 
   class_alloc(preco->recombination_table,preco->re_size*preco->rt_size*sizeof(double),pth->error_message);
 
+
   for(i=0; i <Nz; i++) {
 
     /** - --> get redshift, corresponding results from hyrec, and background quantities */
@@ -2867,7 +2868,15 @@ int thermodynamics_recombination_with_hyrec(
     /* dkappa/dtau = a n_e x_e sigma_T = a^{-2} n_e(today) x_e sigma_T (in units of 1/Mpc) */
     *(preco->recombination_table+(Nz-i-1)*preco->re_size+preco->index_re_dkappadtau)
       = (1.+z) * (1.+z) * preco->Nnow * xe * _sigma_ * _Mpc_over_m_;
-
+    
+	
+    /* !!!!!!!!!!!!!*/
+    char file[200];
+    sprintf(file, "output/HyRec_output.dat");
+    FILE *fout;
+	fout = fopen(file, "a");
+	fprintf(fout,"%7.2lf %15.13lf %15.13lf\n", z, xe, Tm/param.T0/(1.+z));
+    fclose(fout);
   }
 
   /* Cleanup */
