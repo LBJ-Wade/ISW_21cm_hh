@@ -4,7 +4,7 @@ from subprocess import call
 from path import *
 from updateparams import *
 
-def run_cmb (params_list, tag):
+def run_cmb (params_list, tag, Yp_BBN = True):
 
 	# Run CLASS (syncronous gauge)
 	os.chdir (path_CLASS_syn)
@@ -12,8 +12,9 @@ def run_cmb (params_list, tag):
 	newfile = "params_prac2_.ini"
 	clfile = "params_prac_cl.dat"
 	clout = path_data + "/cl_" + tag + ".dat"
-	setparamsfile_CLASS (params_list, oldfile, newfile)
-	call ('./class {0} {1}'.format (newfile, "cl_ref.pre"), shell = True)	
+	setparamsfile_CLASS (params_list, oldfile, newfile, Yp_BBN)
+	#call ('./class {0} {1}'.format (newfile, "cl_ref.pre"), shell = True)	
+	call ('./class {0} '.format (newfile, "cl_ref.pre"), shell = True)	
 	os.chdir ("output")
 	os.system ("cp {0} {1}".format (clfile, clout))
 
@@ -23,7 +24,7 @@ def run_cmb (params_list, tag):
 	
 	return clout
 
-def run_21cm (params_list, params_input, tag, cross = True):
+def run_21cm (params_list, params_input, tag, Yp_BBN = True):
 	
 	
 	#Delete unnecessary output file in CLASS
@@ -36,11 +37,14 @@ def run_21cm (params_list, params_input, tag, cross = True):
 	newfile = "params_prac2_.ini"
 	clfile = "params_prac_cl.dat"
 	clout = path_data + "/params_prac_cl_" + tag + ".dat"
-	setparamsfile_CLASS (params_list, oldfile, newfile)
+	setparamsfile_CLASS (params_list, oldfile, newfile, Yp_BBN)
 	call ('./class {0}'.format (newfile), shell = True)	
+	
 	os.chdir ("output")
 	outfile_syn = path_data + "/delta_syn_{0}.dat".format (tag)
+	outfile_HYREC = "output_prac_{0}.dat".format (tag)
 	os.system ("cp delta.dat {0}".format (outfile_syn))
+	os.system ("cp HyRec_output.dat {0}".format (outfile_HYREC))
 	os.system ("cp {0} {1}".format (clfile, clout))
 	if tag == "0":
 		cl_out = path_result + "/cl_" + tag + ".dat"
@@ -50,21 +54,20 @@ def run_21cm (params_list, params_input, tag, cross = True):
 	os.chdir ("../")
 	os.chdir ("../")
 	
-	if cross == True:
-		# Run CLASS (newtonian gauge)
-		os.chdir (path_CLASS_new)
-		oldfile = "params_prac_.ini"
-		newfile = "params_prac2_.ini"
-		setparamsfile_CLASS (params_list, oldfile, newfile)
-		call ('./class  {0}'.format (newfile), shell = True)	
-		os.chdir ("output")
-		outfile_new = path_data + "/delta_new_{0}.dat".format (tag)
-		os.system ("cp delta.dat {0}".format (outfile_new))
-		#os.system("cp delta.dat {0}/delta_new.dat".format (path_data))
-		os.system ("rm *")
-		os.chdir ("../")
-		os.chdir ("../")
+	# Run CLASS (newtonian gauge)
+	os.chdir (path_CLASS_new)
+	oldfile = "params_prac_.ini"
+	newfile = "params_prac2_.ini"
+	setparamsfile_CLASS (params_list, oldfile, newfile, Yp_BBN)
+	call ('./class  {0}'.format (newfile), shell = True)	
+	os.chdir ("output")
+	outfile_new = path_data + "/delta_new_{0}.dat".format (tag)
+	os.system ("cp delta.dat {0}".format (outfile_new))
+	os.system ("rm *")
+	os.chdir ("../")
+	os.chdir ("../")
 	
+	'''
 	os.chdir (path_HYREC)
 	# Run HYREC	
 	oldfile = "input_prac.dat"
@@ -74,27 +77,13 @@ def run_21cm (params_list, params_input, tag, cross = True):
 	os.system ("gcc -lm -O3 hyrectools.c helium.c hydrogen.c history.c hyrec.c -o hyrec")
 	call ("./hyrec < {0} > {1}".format (newfile, outfile_HYREC), shell = True)	
 	os.chdir ("../")
-	
 	'''
-	# Calculate 21cm fluctuation coefficients
-	outfile_21 = path_data + "/transfer21.txt"
-	os.system ("python c_z.py {0} {1} {2}".format (outfile_syn, outfile_HYREC, "transfer21.txt"))
-	os.system ("cp transfer21.txt {0}".format (outfile_21))
-	os.system ("rm transfer21.txt")
-	'''
-	
+
 	# Calculate C_l
 	outfile_HYREC = path_HYREC + "/output_prac_{0}.dat".format(tag)
-	if cross == True:
-		outfile_cl21 = path_result + "/cl21T_{}.txt".format (tag)
-		file_names = np.array ([params_input, outfile_syn, outfile_new, outfile_HYREC, outfile_cl21])
-		np.savetxt (path_data + '/file_names_{0}.txt'.format (tag), file_names, fmt="%s")
-		#os.system ("python run_cl21.py {0} {1} {2} {3} {4}".format (outfile_syn, outfile_HYREC, outfile_cl21, params_input, outfile_new))
-	else:
-		outfile_cl21 = path_result + "/cl2121_{}.txt".format (tag)
-		file_names = np.array ([params_input, outfile_syn, 'None', outfile_HYREC, outfile_cl21])
-		np.savetxt (path_data + '/file_names_{0}.txt'.format (tag), file_names, fmt="%s")
-		#os.system ("python run_cl21.py {0} {1} {2} {3} {4}".format (outfile_syn, outfile_HYREC, outfile_cl21, params_input, 'None'))
+	outfile_cl21 = path_result + "/cl21T_{}.txt".format (tag)
+	file_names = np.array ([params_input, outfile_syn, outfile_new, outfile_HYREC, outfile_cl21])
+	np.savetxt (path_data + '/file_names_{0}.txt'.format (tag), file_names, fmt="%s")
 		
 # Load cosmological parameters
 #params_list = np.loadtxt (params_input)[0:,]
