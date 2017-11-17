@@ -3,12 +3,22 @@ from numpy.linalg import inv
 from cl_21 import *
 
 class prior_cmb (object):		# Need to add cl^dd
-	def __init__ (self):
-		self.params_input = "params_nonu.dat"
-		self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.02, 0.08]
-		self.params_list = np.loadtxt (self.params_input)[0:,]
-		#self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
-		self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu']
+	def __init__ (self, Yp_BBN = True):
+		self.Yp_BBN = Yp_BBN
+		if self.Yp_BBN == True:
+			self.params_path = path_params_Yp_BBN
+			self.params_input = self.params_path + "/params_nonu.dat"
+			self.params_list = np.loadtxt (self.params_input)[0:,]
+			self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
+			self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.02, 0.08]
+	
+		else:
+			self.params_path = path_params_Yp
+			self.params_input = self.params_path + "/params_nonu.dat"
+			self.params_list = np.loadtxt (self.params_input)[0:,]
+			self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff', 'Yp']
+			self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.02, 0.08, 0.0048]
+		
 		self.deriv_vec = {}
 		self.cov = {}
 		self.l_list = None
@@ -20,30 +30,30 @@ class prior_cmb (object):		# Need to add cl^dd
 			param = self.fisher_params[j]
 			stepsize = self.stepsize[j]
 		
-				
-			infile1 = "params_" + param + "1.dat"
+							
+			infile1 = self.params_path + "/params_" + param + "1.dat"
 			params_list_copy = np.loadtxt (infile1)[0:,]
 			tag = param + "1"
-			outfile1 = run_cmb (params_list_copy,  tag)
+			outfile1 = run_cmb (params_list_copy, tag, self.Yp_BBN)
 
-			infile2 = "params_" + param + "2.dat"
+			infile2 = self.params_path + "/params_" + param + "2.dat"
 			params_list_copy = np.loadtxt (infile2)[0:,] 
 			tag = param + "2"
-			outfile2 = run_cmb (params_list_copy, tag)
+			outfile2 = run_cmb (params_list_copy, tag, self.Yp_BBN)
 			
-
 			#outfile1 = path_data + "/cl_" + param+"1" + ".dat"
 			#outfile2 = path_data + "/cl_" + param+"2" + ".dat"
+			
 			dev_cl = {}
-			l = np.loadtxt (outfile1)[28:,0]
-			clTT1 = np.loadtxt (outfile1)[28:,1] / (l*(l+1)/(2*np.pi)) 
-			clTT2 = np.loadtxt (outfile2)[28:,1] / (l*(l+1)/(2*np.pi)) 
-			clTE1 = np.loadtxt (outfile1)[28:,4] / (l*(l+1)/(2*np.pi)) 
-			clTE2 = np.loadtxt (outfile2)[28:,4] / (l*(l+1)/(2*np.pi)) 
-			clEE1 = np.loadtxt (outfile1)[28:,2] / (l*(l+1)/(2*np.pi)) 
-			clEE2 = np.loadtxt (outfile2)[28:,2] / (l*(l+1)/(2*np.pi)) 
-			cldd1 = np.loadtxt (outfile1)[28:,5] / (l*(l+1)/(2*np.pi)) 
-			cldd2 = np.loadtxt (outfile2)[28:,5] / (l*(l+1)/(2*np.pi))
+			l = np.loadtxt (outfile1)[28:4999,0]
+			clTT1 = np.loadtxt (outfile1)[28:4999,1] / (l*(l+1)/(2*np.pi)) 
+			clTT2 = np.loadtxt (outfile2)[28:4999,1] / (l*(l+1)/(2*np.pi)) 
+			clTE1 = np.loadtxt (outfile1)[28:4999,4] / (l*(l+1)/(2*np.pi)) 
+			clTE2 = np.loadtxt (outfile2)[28:4999,4] / (l*(l+1)/(2*np.pi)) 
+			clEE1 = np.loadtxt (outfile1)[28:4999,2] / (l*(l+1)/(2*np.pi)) 
+			clEE2 = np.loadtxt (outfile2)[28:4999,2] / (l*(l+1)/(2*np.pi)) 
+			cldd1 = np.loadtxt (outfile1)[28:4999,5] / (l*(l+1)/(2*np.pi)) 
+			cldd2 = np.loadtxt (outfile2)[28:4999,5] / (l*(l+1)/(2*np.pi))
 			
 			dev_clTT = (clTT2-clTT1)/(2*stepsize)
 			dev_clTE = (clTE2-clTE1)/(2*stepsize)
@@ -62,21 +72,31 @@ class prior_cmb (object):		# Need to add cl^dd
 		f_sky = 0.7	
 		cov = {}
 		tag = "0"
-		outfile = run_cmb (self.params_list, tag)
+		
+		outfile = run_cmb (self.params_list, tag, self.Yp_BBN)
 		#outfile = path_data + "/cl_" + tag + ".dat"
-		l = np.loadtxt (outfile)[28:,0]
+		
+		l = np.loadtxt (outfile)[28:4999,0]
+		print (l[0], l[-1])
 		clTT_N = (2*0.000290888)**2 *np.e**(l*(l+1)*(0.000290888**2)/(8*np.log(2)))
 		clEE_N = 2*clTT_N
 		self.l_list = l
 		
-		clTT = np.loadtxt (outfile)[28:,1] / (l*(l+1)/(2*np.pi)) 
+		clTT = np.loadtxt (outfile)[28:4999,1] / (l*(l+1)/(2*np.pi)) 
 		clTT += clTT_N
-		clTE = np.loadtxt (outfile)[28:,4] / (l*(l+1)/(2*np.pi)) 
-		clEE = np.loadtxt (outfile)[28:,2] / (l*(l+1)/(2*np.pi)) 
+		clTE = np.loadtxt (outfile)[28:4999,4] / (l*(l+1)/(2*np.pi)) 
+		clEE = np.loadtxt (outfile)[28:4999,2] / (l*(l+1)/(2*np.pi)) 
 		clEE += clEE_N
-		cldd = np.loadtxt (outfile)[28:,5] / (l*(l+1)/(2*np.pi)) 
-		clTd = np.loadtxt (outfile)[28:,6] / (l*(l+1)/(2*np.pi))
-		clEd = np.loadtxt (outfile)[28:,7] / (l*(l+1)/(2*np.pi))
+		
+		cldd = np.loadtxt (outfile)[28:4999,5]
+		infile_noise = default + "/Nldd_2muKarcmin_1arcmin.txt"
+		N = np.loadtxt (infile_noise)[28:4999,1]	
+		N = N*l*(l+1)/(2*np.pi)
+		cldd += N
+		cldd = cldd / (l*(l+1)/(2*np.pi))
+		
+		clTd = np.loadtxt (outfile)[28:4999,6] / (l*(l+1)/(2*np.pi))
+		clEd = np.loadtxt (outfile)[28:4999,7] / (l*(l+1)/(2*np.pi))
 		
 		cov['11'] = 2 * clTT**2 / (2*l+1) /f_sky
 		cov['22'] = (clTT*clEE + clTE**2) / (2*l+1) /f_sky
@@ -104,7 +124,7 @@ class prior_cmb (object):		# Need to add cl^dd
 				F_mn = 0
 				param_m = self.fisher_params[m]
 				param_n = self.fisher_params[n]
-					
+				
 				for ll in range(2971):
 					vec_m = np.zeros(4)
 					vec_n = np.zeros(4)
@@ -133,7 +153,39 @@ class prior_cmb (object):		# Need to add cl^dd
 							inv_cov[i,j] = self.cov["{0}{1}".format(i+1,j+1)][ll]
 					inv_cov = inv(inv_cov)
 					F_mn += np.dot(vec_m, np.dot(inv_cov, vec_n))
-				for ll in range(2971,len(self.l_list)):
+				"""	
+				for ll in range(1471, 2971):
+					vec_m = np.zeros(3)
+					vec_n = np.zeros(3)
+					inv_cov = np.zeros([3,3])
+					
+					for i in range(3):
+						for j in range(3):
+							if i == 0:
+								vec_m[i] = self.deriv_vec[param_m]["TT"][ll]
+							elif i == 1:
+								vec_m[i] = self.deriv_vec[param_m]["TE"][ll]
+							elif i == 2:
+								vec_m[i] = self.deriv_vec[param_m]["EE"][ll]
+							elif i == 3:
+								vec_m[i] = self.deriv_vec[param_m]["dd"][ll]
+							
+							if j == 0:
+								vec_n[j] = self.deriv_vec[param_n]["TT"][ll]
+							elif j == 1:
+								vec_n[j] = self.deriv_vec[param_n]["TE"][ll]
+							elif j == 2:
+								vec_n[j] = self.deriv_vec[param_n]["EE"][ll]
+							elif j == 3:
+								vec_n[j] = self.deriv_vec[param_n]["dd"][ll]
+							
+							inv_cov[i,j] = self.cov["{0}{1}".format(i+1,j+1)][ll]
+					inv_cov = inv(inv_cov)
+					F_mn += np.dot(vec_m, np.dot(inv_cov, vec_n))
+				"""
+				
+				for ll in range(2971,4971):
+					
 					vec_m = np.zeros(3)
 					vec_n = np.zeros(3)
 					inv_cov = np.zeros([3,3])
@@ -164,18 +216,23 @@ class prior_cmb (object):		# Need to add cl^dd
 
 
 class fisher (object): 
-	def __init__ (self):
+	def __init__ (self, Yp_BBN = True):
+		self.Yp_BBN = Yp_BBN	
+		if self.Yp_BBN == True:
+			self.params_path = path_params_Yp_BBN
+			self.params_input = self.params_path + "/params_nonu.dat"
+			self.params_list = np.loadtxt (self.params_input)[0:,]
+			self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
+			self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.02, 0.08]
 	
-		self.params_input = "params_nonu.dat"
-		self.params_list = np.loadtxt (self.params_input)[0:,]
-		
-		self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.02, 0.08]
-		self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
-		#self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.02/3, [0.7117357, 0.721146] ]
-		#self.fisher_params = ['c','b','theta','tau', 'm_nu','Neff']
-		
+		else:
+			self.params_path = path_params_Yp
+			self.params_input = self.params_path + "/params_nonu.dat"
+			self.params_list = np.loadtxt (self.params_input)[0:,]
+			self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff', 'Yp']
+			self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.02, 0.08, 0.0048]
+
 		self.z_m_list = [30, 50,75,100,125,150,175,200]
-		#self.w_list = [3.31685, 2.47355]
 		self.w_list = [3.31685, 2.47355 ,1.93014, 1.60434, 1.38246, 1.21989, 1.09467, 1]
 		self.deriv_vec = {}
 		self.cov = {}
@@ -190,19 +247,19 @@ class fisher (object):
 			stepsize = self.stepsize[j]
 			
 				
-			infile1 = "params_" + param + "1.dat"
+			infile1 = self.params_path + "/params_" + param + "1.dat"
 			params_list_copy = np.loadtxt (infile1)[0:,]
 			tag = param + "_01"
-			run_21cm (params_list_copy, infile1, tag)
-			Cl1 = set_cl_21 (tag)
+			run_21cm (params_list_copy, infile1, tag, self.Yp_BBN)
+			Cl1 = set_cl_21 (tag, self.Yp_BBN)
 			if j == 0:
 				l_list = Cl1.l_list
 
-			infile2 = "params_" + param + "2.dat"
+			infile2 = self.params_path + "/params_" + param + "2.dat"
 			params_list_copy = np.loadtxt (infile2)[0:,] 
 			tag = param + "_02"
-			run_21cm (params_list_copy, infile2, tag)
-			Cl2 = set_cl_21 (tag)
+			run_21cm (params_list_copy, infile2, tag, self.Yp_BBN)
+			Cl2 = set_cl_21 (tag, self.Yp_BBN)
 			
 			dev_cl = {}
 			dev_list = []
@@ -221,26 +278,25 @@ class fisher (object):
 			np.savetxt(out_zm, data, fmt = '%1.6e')
 			
 			
-			"""	
-			out_zm = path_result + '/cl21T_deriv_'+param+'.txt'
+			
+			#out_zm = path_result + '/cl21T_deriv_'+param+'.txt'
 			dev_cl = {}
 			for k in range(len(self.z_m_list)):
 				dev_cl_zm = np.loadtxt(out_zm)[0:,k+1] *2.7255
 				dev_cl['{0}'.format (self.z_m_list[k])] = dev_cl_zm
-			"""
+			
 			self.deriv_vec[param] = dev_cl
 			
 	def cov_matrix (self):
 		""" Construct covariance matrix """
 		print ('Start cov_matrix')
-		f_sky = 0.4
+		f_sky = 0.7
 		cl21T = {}
 		cl21 = {}
 		tag = "0"
 
-		
-		run_21cm (self.params_list, self.params_input, tag)
-		Cl = set_cl_21 (tag)
+		run_21cm (self.params_list, self.params_input, tag, self.Yp_BBN)
+		Cl = set_cl_21 (tag, self.Yp_BBN)
 		l_list = Cl.l_list	
 		cl21T_list = []
 		
@@ -253,12 +309,11 @@ class fisher (object):
 		data = np.column_stack((self.l_list, cl21T_list[0], cl21T_list[1], cl21T_list[2], cl21T_list[3], cl21T_list[4], cl21T_list[5], cl21T_list[6], cl21T_list[7]))
 		np.savetxt(out_zm, data, fmt = '%1.6e')
 		
-		"""
-		out_zm = path_result + '/cl21T_0.txt'
+		
+		#out_zm = path_result + '/cl21T_0.txt'
 		for i in range(len(self.z_m_list)):
 			cl_zm = np.loadtxt (out_zm)[0:,i+1] *2.7255
 			cl21T["{0}".format(i,i)] = cl_zm
-		"""
 		
 		for i in range(len(self.z_m_list)):
 			for j in range(len(self.z_m_list)):
@@ -277,7 +332,8 @@ class fisher (object):
 					data = np.column_stack((self.l_list, cl_zmzl))
 					np.savetxt(out_zm, data, fmt = '%1.6e')
 					"""
-					out_zm = path_result + '/cl21zmzl_{0}{1}.txt'.format(i,j)
+					#out_zm = path_result + '/cl21zmzl_{0}{1}.txt'.format(i,j)
+					out_zm = path_21 + '/cl21zmzl_{0}{1}.txt'.format(i,j)
 					cl_zmzl = np.loadtxt(out_zm)[0:,1]
 					if i == j:
 						cl21["{0}{1}".format(i,j)] = cl_zmzl
@@ -345,14 +401,14 @@ class fisher (object):
 				params_list_copy = self.params_list.copy ()
 				params_list_copy[j] *= (1 - self.stepsize[i])
 				tag = param + "_{}1".format(i)
-				run_21cm (params_list_copy, tag)
-				Cl1 = set_cl_21 (tag)
+				run_21cm (params_list_copy, tag, self.Yp_BBN)
+				Cl1 = set_cl_21 (tag, self.Yp_BBN)
 				
 				params_list_copy = self.params_list.copy ()
 				params_list_copy[j] *= (1 + self.stepsize[i])
 				tag = param + "_{}2".format(i)
-				run_21cm (params_list_copy, tag)
-				Cl2 = set_cl_21 (tag)
+				run_21cm (params_list_copy, tag, self.Yp_BBN)
+				Cl2 = set_cl_21 (tag, self.Yp_BBN)
 				
 				for k in range(len(self.z_m_list)):
 					cl1_zm = Cl1.cl21T (self.z_m_list[k], self.w_list[k])
