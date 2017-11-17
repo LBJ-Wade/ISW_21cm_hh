@@ -7,7 +7,7 @@ import scipy.special
 import sys
 import matplotlib.ticker
 
-def set_cl_21 (tag):		# At the end, it would take z_m_list, w_list as arguments
+def set_cl_21 (tag, Yp_BBN):		# At the end, it would take z_m_list, w_list as arguments
 	""" Construct object of class cl_21 """
 	
 	infile = 'data/file_names_{0}.txt'.format (tag)
@@ -19,15 +19,15 @@ def set_cl_21 (tag):		# At the end, it would take z_m_list, w_list as arguments
 	outfile = file_names[4]
 	
 	params_list = np.loadtxt (params_input)[0:,]
-	Cl = cl_21 (params_list, infile_HYREC, infile_syn, infile_new)
+	Cl = cl_21 (params_list, infile_HYREC, infile_syn, infile_new, Yp_BBN)
 	Cl.test_run () 
 	Cl.c_z ()
 	return Cl
 	
 
 class cl_21 (object):
-	def __init__ (self, params_list, infile_HYREC, infile_syn, infile_new = None):
-
+	def __init__ (self, params_list, infile_HYREC, infile_syn, infile_new, Yp_BBN = True):
+		self.Yp_BBN = Yp_BBN
 		self.params_list = params_list
 		self.infile_syn = infile_syn
 		self.infile_new = infile_new
@@ -77,16 +77,18 @@ class cl_21 (object):
 		self.T_T = None
 		self.T_H = None
 		self.T_b = None
-
-		w = params_list[1]
-		dN = params_list[9] - 3.046
-		y = 0.2311 + 0.9502*w - 11.27*w**2 + dN*(0.01356 + 0.008581*w - 0.1810*w**2) + dN**2 * (-0.0009795 - 0.001370*w + 0.01746*w**2)
-		self.Yp = y
+		if self.Yp_BBN == True:
+			w = self.params_list[1]
+			dN = self.params_list[9] - 3.046
+			y = 0.2311 + 0.9502*w - 11.27*w**2 + dN*(0.01356 + 0.008581*w - 0.1810*w**2) + dN**2 * (-0.0009795 - 0.001370*w + 0.01746*w**2)
+			self.Yp = y
+		else:
+			self.Yp = self.params_list[11]
 		self.c = 299792458.
 		self.Mpc_to_m = 3.0857*10.**22.
-		self.Omega_b = self.params_list[1]
 		self.eV_to_m_inv = 5076142.131979696
 		self.h = self.params_list[10]
+		self.Omega_b = self.params_list[1]/self.h**2
 		self.rho_cr = 8.056*10.**-11. * self.h**2. # eV^4
 		self.mp = 938.2720813*10.**6.  #eV
 		self.me = 0.5109989461*10.**6.	#eV
