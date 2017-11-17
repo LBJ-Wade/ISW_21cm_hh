@@ -41,7 +41,7 @@ def run_21cm (params_list, params_input, tag, Yp_BBN = True):
 	
 	os.chdir ("output")
 	outfile_syn = path_data + "/delta_syn_{0}.dat".format (tag)
-	outfile_HYREC = "output_prac_{0}.dat".format (tag)
+	outfile_HYREC = path_data + "/output_prac_{0}.dat".format (tag)
 	os.system ("cp delta.dat {0}".format (outfile_syn))
 	os.system ("cp HyRec_output.dat {0}".format (outfile_HYREC))
 	os.system ("cp {0} {1}".format (clfile, clout))
@@ -79,7 +79,6 @@ def run_21cm (params_list, params_input, tag, Yp_BBN = True):
 	'''
 
 	# Calculate C_l
-	outfile_HYREC = path_HYREC + "/output_prac_{0}.dat".format(tag)
 	outfile_cl21 = path_result + "/cl21T_{}.txt".format (tag)
 	file_names = np.array ([params_input, outfile_syn, outfile_new, outfile_HYREC, outfile_cl21])
 	np.savetxt (path_data + '/file_names_{0}.txt'.format (tag), file_names, fmt="%s")
