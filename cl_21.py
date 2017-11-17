@@ -16,7 +16,6 @@ def set_cl_21 (tag, Yp_BBN):		# At the end, it would take z_m_list, w_list as ar
 	infile_syn = file_names[1]
 	infile_new = file_names[2]
 	infile_HYREC = file_names[3]
-	outfile = file_names[4]
 	
 	params_list = np.loadtxt (params_input)[0:,]
 	Cl = cl_21 (params_list, infile_HYREC, infile_syn, infile_new, Yp_BBN)

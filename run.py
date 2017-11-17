@@ -79,8 +79,7 @@ def run_21cm (params_list, params_input, tag, Yp_BBN = True):
 	'''
 
 	# Calculate C_l
-	outfile_cl21 = path_result + "/cl21T_{}.txt".format (tag)
-	file_names = np.array ([params_input, outfile_syn, outfile_new, outfile_HYREC, outfile_cl21])
+	file_names = np.array ([params_input, outfile_syn, outfile_new, outfile_HYREC])
 	np.savetxt (path_data + '/file_names_{0}.txt'.format (tag), file_names, fmt="%s")
 		
 # Load cosmological parameters
