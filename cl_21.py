@@ -78,12 +78,14 @@ class cl_21 (object):
 		self.T_H = None
 		self.T_b = None
 
+		w = params_list[1]
+		dN = params_list[9] - 3.046
+		y = 0.2311 + 0.9502*w - 11.27*w**2 + dN*(0.01356 + 0.008581*w - 0.1810*w**2) + dN**2 * (-0.0009795 - 0.001370*w + 0.01746*w**2)
+		self.Yp = y
 		self.c = 299792458.
 		self.Mpc_to_m = 3.0857*10.**22.
-		self.Yp = 0.245
 		self.Omega_b = self.params_list[1]
 		self.eV_to_m_inv = 5076142.131979696
-		#self.h = self.params_list[0]
 		self.h = self.params_list[10]
 		self.rho_cr = 8.056*10.**-11. * self.h**2. # eV^4
 		self.mp = 938.2720813*10.**6.  #eV
@@ -175,7 +177,7 @@ class cl_21 (object):
 		T_H = np.interp(zz[::-1], self.z_HYREC[::-1], self.T_H[::-1])[::-1]
 		T_b = np.interp(zz[::-1], self.z_HYREC[::-1], self.T_b[::-1])[::-1]
 		
-		for i in [self.number_of_k2-1]:#range(number_of_k):#[20, 28, 184, 443, 551, 584,594]:#range(20,number_of_k):
+		for i in [self.number_of_k2-1]:
 			kk = self.klist2[::-1][i]
 			print (i, kk)
 			b = self.baryon[i*self.number_of_z2:(i+1)*self.number_of_z2]
@@ -207,10 +209,6 @@ class cl_21 (object):
 		self.zlist = np.array (redshift)
 		wavenumber = np.array (wavenumber)
 		self.zz = zz	
-		#data = np.column_stack((redshift, wavenumber, T21, redshift_distortion, hubble_list, baryon))
-		#np.savetxt('transfer_21_nonu_Neff.txt', data, fmt = '%1.6e')
-		#np.savetxt(outfile, data, fmt = '%1.6e')
-		
 			
 	def cl21T (self, z_m, w):
 		""" Calculate cross-correlation functions of ISW and 21 cm """
@@ -241,7 +239,6 @@ class cl_21 (object):
 			transfer_21 = []
 			transfer_dphidz = []
 			for j in range(len(kk)):
-				#T = delta_21 (z[j], kk[j])[0]
 				T = np.interp (z[j], zz, delta_21)
 				bb = T_baryon (z[j], kk[j])[0]
 				transfer_21.append (T*bb)
@@ -249,19 +246,6 @@ class cl_21 (object):
 				transfer_dphidz.append (p)
 			transfer_21 = np.array (transfer_21)
 			transfer_dphidz = np.array (transfer_dphidz)
-			"""	
-			plt.figure(1)
-			plt.plot (z,P_phi_local)
-			plt.figure(2)
-			plt.plot (z,transfer_21)
-			plt.figure(3)
-			plt.plot (z,transfer_dphidz)
-			plt.figure(4)
-			plt.plot (z,hubble_local)
-			plt.figure(5)
-			plt.plot (z,chi_class_local)
-			plt.show()
-			"""
 			
 			integrand = -2 * P_phi_local * sel * transfer_21 * transfer_dphidz * hubble_local / chi_class_local**2
 			cl = simps (integrand, z)
