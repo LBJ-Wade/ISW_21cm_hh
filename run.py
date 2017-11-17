@@ -13,8 +13,7 @@ def run_cmb (params_list, tag, Yp_BBN = True):
 	clfile = "params_prac_cl.dat"
 	clout = path_data + "/cl_" + tag + ".dat"
 	setparamsfile_CLASS (params_list, oldfile, newfile, Yp_BBN)
-	#call ('./class {0} {1}'.format (newfile, "cl_ref.pre"), shell = True)	
-	call ('./class {0} '.format (newfile, "cl_ref.pre"), shell = True)	
+	call ('./class {0} {1}'.format (newfile, "cl_ref.pre"), shell = True)	
 	os.chdir ("output")
 	os.system ("cp {0} {1}".format (clfile, clout))
 
