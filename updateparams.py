@@ -1,4 +1,4 @@
-def setparamsfile_CLASS (params_list, pfilename, pnewfilename):
+def setparamsfile_CLASS (params_list, pfilename, pnewfilename, Yp_BBN):
 	with open (pfilename) as file: lines = file.read ().splitlines ()
 	with open (pnewfilename, 'w') as file:
 		for line in lines:
@@ -48,18 +48,22 @@ def setparamsfile_CLASS (params_list, pfilename, pnewfilename):
 				print (line, '-> {0}'.format (params_list[7]))
 			
 			elif line.startswith ('YHe'):
-				w = params_list[1]
-				dN = params_list[9] - 3.046
-				y = 0.2311 + 0.9502*w - 11.27*w**2 + dN*(0.01356 + 0.008581*w - 0.1810*w**2) + dN**2 * (-0.0009795 - 0.001370*w + 0.01746*w**2)
-				file.write (line.replace (line, 'YHe = {0}' .format (y)))
-				file.write ('\n')
-				print (line, '-> {0}'.format (y))
-		
+				if Yp_BBN == True:
+					w = params_list[1]
+					dN = params_list[9] - 3.046
+					y = 0.2311 + 0.9502*w - 11.27*w**2 + dN*(0.01356 + 0.008581*w - 0.1810*w**2) + dN**2 * (-0.0009795 - 0.001370*w + 0.01746*w**2)
+					file.write (line.replace (line, 'YHe = {0}' .format (y)))
+					file.write ('\n')
+					print (line, '-> {0}'.format (y))
+				else:
+					file.write (line.replace (line, 'YHe = {0}' .format (params_list[11])))
+					file.write ('\n')
+					print (line, '-> {0}'.format (params_list[11]))
 			else:
 				print (line)
 				file.write(line)
 				file.write('\n')
-
+'''
 def setparamsfile_HYREC (params_list, pfilename, pnewfilename):
 	with open (pfilename) as file: lines = file.read ().splitlines ()
 	with open (pnewfilename, 'w') as file:
@@ -100,3 +104,4 @@ def setparamsfile_HYREC (params_list, pfilename, pnewfilename):
 				print (lines[i])
 				file.write(lines[i])
 				file.write('\n')
+'''
