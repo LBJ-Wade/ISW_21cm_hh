@@ -304,7 +304,8 @@ class cl_21 (object):
 				transfer_21.append (T*bb)
 			transfer_21 = np.array (transfer_21)
 	
-			integrand = 2.*np.pi**2/l**3 * kk**3*P_phi_local/(2*np.pi**2) * sel1 * sel2 * transfer_21**2 * chi_class_local * hubble_local
+			#integrand = 2.*np.pi**2/l**3 * kk**3*P_phi_local/(2*np.pi**2) * sel1 * sel2 * transfer_21**2 * chi_class_local * hubble_local
+			integrand = P_phi_local * sel1 * sel2 * transfer_21**2 * hubble_local /chi_class_local**2
 			cl = simps (integrand, z)
 			cl_list.append (cl)
 	
