@@ -46,7 +46,10 @@ def run_21cm (params_list, params_input, tag, Yp_BBN = True):
 	os.system ("cp HyRec_output.dat {0}".format (outfile_HYREC))
 	os.system ("cp {0} {1}".format (clfile, clout))
 	if tag == "0":
-		cl_out = path_result + "/cl_" + tag + ".dat"
+		if Yp_BBN == True:
+			cl_out = path_result_Yp_BBN + "/cl_" + tag + ".dat"
+		else:
+			cl_out = path_result_Yp + "/cl_" + tag + ".dat"
 		os.system ("cp params_prac_cl.dat {1}".format(tag, cl_out))
 
 	os.system ("rm *")
