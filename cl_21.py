@@ -6,10 +6,13 @@ import matplotlib.pyplot as plt
 import scipy.special
 import sys
 import matplotlib.ticker
+from parallel_func import *
+import time
 
-def set_cl_21 (tag, Yp_BBN):		# At the end, it would take z_m_list, w_list as arguments
+def set_cl_21 (comm, rank, size, tag, Yp_BBN):		# At the end, it would take z_m_list, w_list as arguments
 	""" Construct object of class cl_21 """
 	
+	print ('-> (Rank:{0}) Make object of class cl_21'.format(rank))
 	infile = 'data/file_names_{0}.txt'.format (tag)
 	file_names = np.genfromtxt(infile, dtype="str")[0:]
 	params_input = file_names[0]
@@ -18,36 +21,36 @@ def set_cl_21 (tag, Yp_BBN):		# At the end, it would take z_m_list, w_list as ar
 	infile_HYREC = file_names[3]
 	
 	params_list = np.loadtxt (params_input)[0:,]
-	Cl = cl_21 (params_list, infile_HYREC, infile_syn, infile_new, Yp_BBN)
+	Cl = cl_21 (comm, rank, size, params_list, infile_HYREC, infile_syn, infile_new, Yp_BBN)
 	Cl.test_run () 
 	Cl.c_z ()
 	return Cl
 	
 
 class cl_21 (object):
-	def __init__ (self, params_list, infile_HYREC, infile_syn, infile_new, Yp_BBN = True):
+	def __init__ (self, comm, rank, size, params_list, infile_HYREC, infile_syn, infile_new, Yp_BBN = True):
+		
+		self.comm =	comm 
+		self.rank = rank
+		self.size = size
+		
 		self.Yp_BBN = Yp_BBN
 		self.params_list = params_list
 		self.infile_syn = infile_syn
 		self.infile_new = infile_new
 		self.infile_HYREC = infile_HYREC
-		#self.infile_21 = infile_21
 
 		z = np.loadtxt(self.infile_syn)[0:,0]
-		print ('z data', len(z))
 		k = np.loadtxt(self.infile_syn)[0:,1]
-		print ('k data', len(k))
 		self.zlist2 = np.array(sorted(set(z)))
 		self.klist2 = np.array(sorted(set(k)))
 		self.number_of_z2 = len(self.zlist2)
 		self.number_of_k2 = len(self.klist2)
 		self.hubble_class = np.loadtxt(self.infile_syn)[0:self.number_of_z2,4][::-1]
-		print ('hubble data', len(self.hubble_class))
 		self.baryon = -np.loadtxt(self.infile_syn)[0:,2]
 		self.baryon_dot = -np.loadtxt(self.infile_syn)[0:,3]
 
 		As = (np.e**self.params_list[4])*10**(-10)
-		print(As)
 		n_s = self.params_list[5]
 		k_pivot = 0.05
 		self.k_list = np.logspace (-4,5, 5000)
@@ -88,29 +91,32 @@ class cl_21 (object):
 		self.eV_to_m_inv = 5076142.131979696
 		self.h = self.params_list[10]
 		self.Omega_b = self.params_list[1]/self.h**2
-		self.rho_cr = 8.056*10.**-11. * self.h**2. # eV^4
-		self.mp = 938.2720813*10.**6.  #eV
-		self.me = 0.5109989461*10.**6.	#eV
+		self.rho_cr = 8.056*10.**-11. * self.h**2.					# eV^4
+		self.mp = 938.2720813*10.**6.  								# eV
+		self.me = 0.5109989461*10.**6.								# eV
 		self.sigma_T = 6.6524587158 * 10. **-29.
 		self.J_to_eV = 6.2415093433*10.**18.
-		self.k_B = 8.613303*10.**-5. # eV/K
-		self.wavelength = 0.21 #m
-		self.E10 = 0.068															# K
-		self.A10 = 2.85*10.**-15. / self.c											# /m	
-		self.B10 = self.A10*(1.+1./(np.e**(self.E10/self.Tr)-1.))							# /m
+		self.k_B = 8.613303*10.**-5. 								# eV/K
+		self.wavelength = 0.21 										# m
+		self.E10 = 0.068											# K
+		self.A10 = 2.85*10.**-15. / self.c							# /m
+		self.B10 = self.A10*(1.+1./(np.e**(self.E10/self.Tr)-1.))	# /m
 		
+		"""
 		l_list = np.logspace(np.log10(2), np.log10(5000), 500)
-		#l_list = np.logspace(np.log10(2), np.log10(10), 2)
 		for i in range(len(l_list)):
 			l_list[i] = int(l_list[i])
 		l_list = sorted(set(l_list))
 		l_list[-1] += 1.
 		self.l_list = np.array (l_list)
-
-
+		"""
+		self.l_list = np.arange(2,101)
+		self.l_list_core = None
+		print ('   (Rank:{0}) Done'.format(self.rank))	
 	def test_run (self):
 		""" Calculate coefficients of 21 cm fluctuations (linear terms) """
 
+		print ('-> (Rank:{0}) Calculating the coefficient of 21 cm fluctuaions'.format(self.rank))
 		zlist = self.zlist2.copy ()
 		hubble_class = self.hubble_class.copy ()
 	
@@ -120,12 +126,12 @@ class cl_21 (object):
 		hubble = np.interp (z[::-1], zlist, hubble_class)[::-1]
 		n_H = (1-self.Yp)*self.rho_cr*self.Omega_b/self.mp*(1+z)**3 		# eV^3
 		n_H *= self.eV_to_m_inv**3											# /m^3
-		kappa = 3.1*10**-11 *self.Tm**0.357 * np.e**(-32/self.Tm) * 10**-6 			# m^3/s
+		kappa = 3.1*10**-11 *self.Tm**0.357 * np.e**(-32/self.Tm) * 10**-6 	# m^3/s
 		kappa /= self.c														# m^2
 		wavelength = self.wavelength	
 		C10 = n_H*kappa														# /m
-		C01 = 3*np.e**(-self.E10/self.Tm)*C10											# /m
-		I_nu = 2*self.k_B*self.Tr/wavelength**2									# eV/m^2
+		C01 = 3*np.e**(-self.E10/self.Tm)*C10								# /m
+		I_nu = 2*self.k_B*self.Tr/wavelength**2								# eV/m^2
 		I_nu *= self.eV_to_m_inv											# /m^3
 	
 		hubble = hubble/self.Mpc_to_m
@@ -147,10 +153,13 @@ class cl_21 (object):
 		self.T_b = T_b
 		
 		
+		print ('   (Rank:{0}) Done'.format(self.rank))	
 		return z, T_T, T_H, T_b
 
 	def c_z (self):
 		""" Calculate C1(z) which is defiend as T_{Tgas} = C1(z) T_{b} """
+		
+		print ('-> (Rank:{0}) Solving for the temperature of the gas'.format(self.rank))
 
 		hubble_class = self.hubble_class[::-1].copy ()
 
@@ -180,7 +189,6 @@ class cl_21 (object):
 		
 		for i in [self.number_of_k2-1]:
 			kk = self.klist2[::-1][i]
-			print (i, kk)
 			b = self.baryon[i*self.number_of_z2:(i+1)*self.number_of_z2]
 			b = np.interp (new_z[::-1], self.zlist2, b[::-1])[::-1]
 			b_dot = self.baryon_dot[i*self.number_of_z2:(i+1)*self.number_of_z2]*(-hubble_class)
@@ -210,10 +218,12 @@ class cl_21 (object):
 		self.zlist = np.array (redshift)
 		wavenumber = np.array (wavenumber)
 		self.zz = zz	
+		print ('   (Rank:{0}) Done'.format(self.rank))	
 			
 	def cl21T (self, z_m, w):
 		""" Calculate cross-correlation functions of ISW and 21 cm """
-
+		
+		print ('-> (Rank:{0}) Calculating the cross-correlation at z = {1}'.format(self.rank, z_m))
 		z, sel, _ = sf.run_sel (w, z_m)
 		
 		chi_class_local = np.interp (z, self.zlist2, self.chi_class)
@@ -232,8 +242,12 @@ class cl_21 (object):
 		delta_21 = self.T21[::-1].copy ()
 		zz = self.zz[::-1].copy ()
 		cl_list = []
-		for l in self.l_list:
-			print (l)
+		
+		self.l_list_core = job_alloc (self.comm, self.rank, self.size, self.l_list)
+
+		a = time.time()	
+		for l in self.l_list_core:
+			print '   Rank :',self.rank,', ell :', l
 			kk = (l+1./2.)/chi_class_local
 			P_phi_local = np.interp (kk, self.k_list, self.P_phi)
 			
@@ -251,8 +265,10 @@ class cl_21 (object):
 			integrand = -2 * P_phi_local * sel * transfer_21 * transfer_dphidz * hubble_local / chi_class_local**2
 			cl = simps (integrand, z)
 			cl_list.append (cl)
-	
+		self.comm.Barrier ()	
 		cl_list = np.array (cl_list)
+		cl_list = combine_result (self.comm, self.rank, self.size, cl_list)		
+		print ('   (Rank:{0}) Done'.format(self.rank))	
 		
 		return cl_list
 
@@ -260,6 +276,8 @@ class cl_21 (object):
 
 	def cl21 (self, z_m, w):
 		""" Calculate 21 cm auto-correlation functions """
+			
+		print ('-> (Rank:{0}) Calculating the auto-correlation at z = {1} and {2}'.format(self.rank,z_m[0],z_m[1]))
 		
 		z, sel1, _ = sf.run_sel (w[0], z_m[0])
 		z, sel2, _ = sf.run_sel (w[1], z_m[1])
@@ -273,27 +291,16 @@ class cl_21 (object):
 			T_baryon.append (bb)
 		T_baryon = interp2d (self.zlist2, self.klist2, T_baryon[::-1], kind = 'cubic')
 		
-		"""
-		delta_21 =[]
-		distortion = []
-		for i in range(number_of_k):
-			bb = self.baryon[number_of_z*i:number_of_z*(i+1)][::-1]
-
-			d = self.T21[number_of_z*(number_of_k-1):number_of_z*number_of_k][::-1]
-			d = d*bb
-			delta_21.append (d)
-			d = self.redshift_distortion[number_of_z*i:number_of_z*(i+1)][::-1]
-			d = d*bb
-			distortion.append (d)
-		delta_21 = interp2d (zlist, klist, delta_21[::-1], kind = 'cubic')
-		distortion = interp2d (zlist, klist, distortion[::-1], kind = 'cubic')
-		"""
 		delta_21 = self.T21[::-1].copy ()
 		zz = self.zz[::-1].copy ()
 
 		cl_list = []
-		for l in self.l_list:
-			print (l)
+		
+		self.l_list_core = job_alloc (self.comm, self.rank, self.size, self.l_list)
+		
+		a = time.time()
+		for l in self.l_list_core:
+			print '   Rank :',self.rank,', ell :', l
 			kk = (l+1./2.)/chi_class_local
 			P_phi_local = np.interp (kk, self.k_list, self.P_phi)
 			
@@ -304,12 +311,14 @@ class cl_21 (object):
 				transfer_21.append (T*bb)
 			transfer_21 = np.array (transfer_21)
 	
-			#integrand = 2.*np.pi**2/l**3 * kk**3*P_phi_local/(2*np.pi**2) * sel1 * sel2 * transfer_21**2 * chi_class_local * hubble_local
 			integrand = P_phi_local * sel1 * sel2 * transfer_21**2 * hubble_local /chi_class_local**2
 			cl = simps (integrand, z)
 			cl_list.append (cl)
-	
+		print (time.time()-a)
+		self.comm.Barrier ()	
 		cl_list = np.array (cl_list)
+		cl_list = combine_result (self.comm, self.rank, self.size, cl_list)		
+		print ('   (Rank:{0}) Done'.format(self.rank))	
 		
 		return cl_list
 
@@ -471,53 +480,4 @@ class cl_21 (object):
 		print (cl_list)
 		
 		return cl_list
-
-"""
-#cl, cl2 = cl21 (z_m)
-cl, cl2 = cl21T (z_m)
-data = np.column_stack((l_list, cl2, cl))
-#np.savetxt('cl_21cm_l10^7_6MHz_fix.txt', data, fmt = '%1.6e')
-np.savetxt(outfile, data, fmt = '%1.6e')
-#np.savetxt('result/antony/nanoom/21T_nu2_{}.txt'.format(z_m), data, fmt = '%1.6e')
-#print ('21T_nu2_{}.txt'.format(z_m))
-aa = 2.7255*10**6
-plt.plot (l_list, np.sqrt(aa*cl*l_list*(l_list+1)/(2*np.pi)), label = 'limber2')
-plt.plot (l_list, np.sqrt(aa*cl2*l_list*(l_list+1)/(2*np.pi)), label = 'limber')
-#plt.plot (l_list, np.sqrt(aa*mono/l_list), label = 'mono')
-#plt.plot (l_list, np.sqrt(aa*monovel/l_list), label = 'monovel')
-#plt.plot (l_list, np.sqrt(aa*vel/l_list), label = 'vel')
-#plt.plot (l_list, np.sqrt(aa*(mono+monovel+vel)/l_list), label = 'approx')
-plt.legend ()
-#plt.axis([2,10**7,10**-3,10])
-plt.xscale ('log')
-plt.yscale ('log')
-"""
-"""
-aa = 2.7255*10**6
-#cl = cl21_sharp ()
-#cl, ab, bb = cl21_exact ()
-cl = cl21_exact ()
-#data = np.column_stack((l_list, cl,ab,bb))
-data = np.column_stack((l_list, cl))
-#np.savetxt('result/antony/antony_sharp_10000.txt', data, fmt = '%1.6e')
-#print ('antony_sharp.txt, 10000')
-np.savetxt('result/antony/antony_6MHz_5000.txt', data, fmt = '%1.6e')
-print ('antony_exact_6MHz_5000.txt')
-#print ('antony_exact_6MHz_100000, l=2, not saved')
-
-#np.savetxt('cl_21cm_l10^7_exact_novel_01MHz.txt', data, fmt = '%1.6e')
-#np.savetxt('cl_21cm_l10^7_sharp2.txt', data, fmt = '%1.6e')
-aa = 2.7255*10**6
-plt.plot (l_list, np.sqrt(aa*cl*l_list*(l_list+1)/(2*np.pi)), label = 'aa')
-#plt.plot (l_list, np.sqrt(aa*ab*l_list*(l_list+1)/(2*np.pi)), label = 'ab')
-#plt.plot (l_list, np.sqrt(aa*bb*l_list*(l_list+1)/(2*np.pi)), label = 'bb')
-#plt.plot (l_list, np.sqrt(aa*cl*l_list*(l_list+1)/(2*np.pi)), label = 'sharp')
-plt.legend ()
-plt.axis([2,10**7,10**-3,10])
-plt.xscale ('log')
-plt.yscale ('log')
-
-print (np.sqrt(aa*cl*l_list*(l_list+1)/(2*np.pi)))
-plt.show()
-"""
 

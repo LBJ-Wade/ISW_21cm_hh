@@ -7,4 +7,5 @@ n_s
 m_ncdm
 N_ur
 Omega_Lambda*h^2
+Neff
 h

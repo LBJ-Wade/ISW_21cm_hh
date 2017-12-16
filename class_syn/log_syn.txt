@@ -1,0 +1,39 @@
+Reading input parameters
+ -> matched budget equations by adjusting Omega_Lambda = 6.941585e-01
+ -> matched budget equations by adjusting Omega_Lambda = 7.194742e-01
+ -> matched budget equations by adjusting Omega_Lambda = 7.028822e-01
+ -> matched budget equations by adjusting Omega_Lambda = 6.847735e-01
+ -> matched budget equations by adjusting Omega_Lambda = 6.940287e-01
+ -> matched budget equations by adjusting Omega_Lambda = 6.998154e-01
+ -> matched budget equations by adjusting Omega_Lambda = 7.013547e-01
+Computing unknown input parameters
+ -> found h = 6.818957e-01
+ -> matched budget equations by adjusting Omega_Lambda = 6.998154e-01
+Running CLASS version v2.6.0
+Computing background
+ -> ncdm species i=1 sampled with 11 (resp. 5) points for purpose of background (resp. perturbation) integration. In the relativistic limit it gives Delta N_eff = 1.0132
+ -> total N_eff = 3.046 (sumed over ultra-relativistic and ncdm species)
+ -> non-cold dark matter species with i=1 has m_i = 6.000000e-02 eV (so m_i / omega_i =9.313858e+01 eV)
+ -> age = 13.818106 Gyr
+ -> conformal age = 14258.120184 Mpc
+Computing thermodynamics
+ -> calling HyRec version Nov2011,
+    by Y. Ali-Haïmoud & C. Hirata
+ -> recombination at z = 1089.271102
+    corresponding to conformal time = 282.337008 Mpc
+    with comoving sound horizon = 145.473758 Mpc
+    angular diameter distance = 12.818631 Mpc
+    and sound horizon angle 100*theta_s = 1.040899
+ -> baryon drag stops at z = 1059.755009
+    corresponding to conformal time = 288.187201 Mpc
+    with comoving sound horizon rs = 148.122480 Mpc
+ -> reionization  at z = 8.242111
+    corresponding to conformal time = 5011.623834 Mpc
+Computing sources
+Computing primordial spectra (analytic spectrum)
+No non-linear spectra requested. Nonlinear module skipped.
+Computing transfers
+Computing unlensed linear spectra
+ -> sigma8=0.817788 (computed till k = 1.23684 h/Mpc)
+No lensing requested. Lensing module skipped.
+Writing output files in output/params_prac_... 
