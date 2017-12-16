@@ -11,7 +11,8 @@ class prior_cmb (object):		# Need to add cl^dd
 			self.params_list = np.loadtxt (self.params_input)[0:,]
 			self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
 			self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu']
-			self.stepsize = [0.0030, 8.0e-4, 5.0e-3, 0.02, 0.045, 0.01, 0.02, 0.08]
+			self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.02, 0.08]
+			#self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.08]
 		else:
 			self.params_path = path_params_Yp
 			self.params_input = self.params_path + "/params_nonu.dat"
@@ -217,7 +218,7 @@ class prior_cmb (object):		# Need to add cl^dd
 							inv_cov[i,j] = self.cov["{0}{1}".format(i+2,j+2)][ll]
 					inv_cov = inv(inv_cov)
 					F_mn += np.dot(vec_m, np.dot(inv_cov, vec_n))
-			
+				
 				F[m,n] = F_mn
 		return F
 
@@ -244,7 +245,8 @@ class fisher (object):
 
 		self.z_m_list = [30, 50,75,100,125,150,175,200]
 		#self.w_list = [3.31685, 2.47355 ,1.93014, 1.60434, 1.38246, 1.21989, 1.09467, 1]
-		self.w_list = [3.20283, 2.4956, 2.0427, 1.7706, 1.5841, 1.4459, 1.3383, 1.2513]		# 600 Mpc
+		self.w_list = [3.20283, 2.4956, 2.0427, 1.7706, 1.5841, 1.4459, 1.3383, 1.2513]		# 3sigma 600 Mpc
+		self.w_list = [3.1891, 2.4779, 2.0211, 1.7456, 1.5560, 1.4151, 1.3050, 1.2156] 		# 4sigma 800 Mpc
 		self.deriv_vec = {}
 		self.cov = {}
 
@@ -257,7 +259,7 @@ class fisher (object):
 			param = self.fisher_params[j]
 			stepsize = self.stepsize[j]
 			
-			"""	
+			"""				
 			infile1 = self.params_path + "/params_" + param + "1.dat"
 			params_list_copy = np.loadtxt (infile1)[0:,]
 			tag = param + "_01"
@@ -289,12 +291,13 @@ class fisher (object):
 			np.savetxt(out_zm, data, fmt = '%1.6e')
 			"""
 			
+			
 			out_zm = self.path_result + '/cl21T_deriv_'+param+'.txt'
 			dev_cl = {}
 			for k in range(len(self.z_m_list)):
 				dev_cl_zm = np.loadtxt(out_zm)[0:,k+1] *2.7255
 				dev_cl['{0}'.format (self.z_m_list[k])] = dev_cl_zm
-			
+		
 			self.deriv_vec[param] = dev_cl
 			
 	def cov_matrix (self):
@@ -305,7 +308,7 @@ class fisher (object):
 		cl21 = {}
 		tag = "0"
 
-		"""
+		"""	
 		run_21cm (self.params_list, self.params_input, tag, self.Yp_BBN)
 		Cl = set_cl_21 (tag, self.Yp_BBN)
 		l_list = Cl.l_list	
@@ -322,11 +325,11 @@ class fisher (object):
 		"""
 		
 		out_zm = self.path_result + '/cl21T_0.txt'
-
 		for i in range(len(self.z_m_list)):
 			cl_zm = np.loadtxt (out_zm)[0:,i+1] *2.7255
 			cl21T["{0}".format(i,i)] = cl_zm
 		
+
 		for i in range(len(self.z_m_list)):
 			for j in range(len(self.z_m_list)):
 				if not j < i:
@@ -381,19 +384,19 @@ class fisher (object):
 					vec_m = np.zeros(len(self.z_m_list))
 					vec_n = np.zeros(len(self.z_m_list))
 					inv_cov = np.zeros([len(self.z_m_list), len(self.z_m_list)])
-					for i in range(len(self.z_m_list)):
-						for j in range(len(self.z_m_list)):
-							vec_m[i] = self.deriv_vec[param_m]["{0}".format(self.z_m_list[i])][l]
-							vec_n[j] = self.deriv_vec[param_n]["{0}".format(self.z_m_list[j])][l]
-							inv_cov[i,j] = self.cov["{0}{1}".format(i,j)][l]
-							#vec_m = self.deriv_vec[param_m]["{0}".format(self.z_m_list[i])][l]
-							#vec_n = self.deriv_vec[param_n]["{0}".format(self.z_m_list[j])][l]
-							#inv_cov = self.cov["{0}{1}".format(i,j)][l]
+					for i in [7]:#range(len(self.z_m_list)):
+						for j in [7]:#range(len(self.z_m_list)):
+							#vec_m[i] = self.deriv_vec[param_m]["{0}".format(self.z_m_list[i])][l]
+							#vec_n[j] = self.deriv_vec[param_n]["{0}".format(self.z_m_list[j])][l]
+							#inv_cov[i,j] = self.cov["{0}{1}".format(i,j)][l]
+							vec_m = self.deriv_vec[param_m]["{0}".format(self.z_m_list[i])][l]
+							vec_n = self.deriv_vec[param_n]["{0}".format(self.z_m_list[j])][l]
+							inv_cov = self.cov["{0}{1}".format(i,j)][l]
 						
-					inv_cov = inv(inv_cov)
-					F_mn += np.dot (vec_m, np.dot (inv_cov ,vec_n))
-					#inv_cov = 1/inv_cov
-					#F_mn += vec_m*inv_cov*vec_n
+					#inv_cov = inv(inv_cov)
+					#F_mn += np.dot (vec_m, np.dot (inv_cov ,vec_n))
+					inv_cov = 1/inv_cov
+					F_mn += vec_m*inv_cov*vec_n
 				F[m,n] = F_mn
 		return F
 

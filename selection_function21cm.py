@@ -26,7 +26,7 @@ def run_sel(w,z_m):
 	sigma_wl = wl2-wl1
 	
 	zz = np.linspace(400,10,5000)
-
+	zz = np.linspace(z1, z2, 1000)
 	sel_func = 1/np.sqrt(2*np.pi*width**2) * np.exp (-(f-freq)**2/(2*width**2))
 	sel_func = f0/(1+zz)**2 * 1/np.sqrt(2*np.pi*width**2) * np.exp (-(f0/(1+zz)-f0/(1+z_m))**2/(2*width**2))
 	

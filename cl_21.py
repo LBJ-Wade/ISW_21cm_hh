@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 import scipy.special
 import sys
 import matplotlib.ticker
+from tools import *
+from path import *
+import nanoom as nn
 
 def set_cl_21 (tag, Yp_BBN):		# At the end, it would take z_m_list, w_list as arguments
 	""" Construct object of class cl_21 """
@@ -31,8 +34,9 @@ class cl_21 (object):
 		self.infile_syn = infile_syn
 		self.infile_new = infile_new
 		self.infile_HYREC = infile_HYREC
-		#self.infile_21 = infile_21
 
+
+		# Load data from CLASS
 		z = np.loadtxt(self.infile_syn)[0:,0]
 		print ('z data', len(z))
 		k = np.loadtxt(self.infile_syn)[0:,1]
@@ -151,6 +155,28 @@ class cl_21 (object):
 
 	def c_z (self):
 		""" Calculate C1(z) which is defiend as T_{Tgas} = C1(z) T_{b} """
+		# Interpolate HyRec table
+		ALPHA_FILE = default + "/class_syn/hyrec/Alpha_inf.dat"
+		RR_FILE = default + "/class_syn/hyrec/R_inf.dat"
+		NTR = 100
+		NTM = 40
+		TR_MIN = 0.004
+		TR_MAX = 0.4
+		TM_TR_MIN = 0.1
+		TM_TR_MAX = 1.0
+
+		logTR_tab = maketab (np.log(TR_MIN), np.log(TR_MAX), NTR)
+		TM_TR_tab = maketab (TM_TR_MIN, TM_TR_MAX, NTM)
+		DlogTR = logTR_tab[1] - logTR_tab[0]
+		DTM_TR = TM_TR_tab[1] - TM_TR_tab[0]
+
+		logR2p2s_tab = np.log(np.loadtxt (RR_FILE)[0:])
+		logAlpha_tab = np.zeros([2,NTM,NTR])
+		for i in range(NTR):
+			Alpha1 = np.loadtxt(ALPHA_FILE)[i*NTM:(i+1)*NTM,0]
+			Alpha2 = np.loadtxt(ALPHA_FILE)[i*NTM:(i+1)*NTM,1]
+			logAlpha_tab[0,:,i] = np.log(Alpha1)
+			logAlpha_tab[1,:,i] = np.log(Alpha2)
 
 		hubble_class = self.hubble_class[::-1].copy ()
 
@@ -165,11 +191,40 @@ class cl_21 (object):
 		a_r = 4*5.670373 * 10**-8 * self.J_to_eV	#eV m^-2 s^-1 K^-4
 		x_He = self.Yp/(4*(1-self.Yp))
 		gamma = (8*self.sigma_T*a_r*Tr**4)/(3*(1+x_He+x)*self.me) *x	# s^-1
-		gamma /= self.c		# m^-1
-		hubble /= self.Mpc_to_m
-		hubble_class /= self.Mpc_to_m
+		#gamma /= self.c		# m^-1
+		Tr *= self.k_B
+		Tm *= self.k_B
+		Tm_Tr = Tm/Tr
+		
+		hubble = hubble * self.c / self.Mpc_to_m
+		hubble_class = hubble_class *self.c / self.Mpc_to_m
+
+		n_H = (1-self.Yp)*self.rho_cr*self.Omega_b/self.mp*(1+new_z)**3		# eV^3
+		n_H *= self.eV_to_m_inv**3											# /m^3
+		n_H *= 1e-6
+		L2s1s = 8.2206
+
+		Beta1 = []
+		Beta2 = []
+		Alpha1 = []
+		Alpha2 = []
+		for i in range(len(new_z)):
+			Alpha, Beta, R2p2s = interpolate_rates (Tr[i], Tm_Tr[i], logAlpha_tab,logR2p2s_tab, DTM_TR, DlogTR)
+			Beta1.append (Beta[0])
+			Beta2.append (Beta[1])
+			Alpha1.append (Alpha[0])
+			Alpha2.append (Alpha[1])
+		AB = np.array(Alpha1) + np.array(Alpha2)
+		Beta_ = np.array(Beta1) + np.array(Beta2)
+		RLya = 4.662899067555897e15 *hubble /n_H/(1.-x)
+		#RLya = 4.662899067555897e15 *(Hubble + theta_b/3.) /n_H/(1.-x)
+		C = (3*RLya + L2s1s)/(3*RLya + L2s1s + 4*Beta_)
+		dlogC_dlogRLya = -nn.derivative (np.log(RLya), np.log(C))
+
+		x_dot = -C*AB*n_H*x**2
 
 		T21 = []
+		T21_2 = []
 		redshift_distortion = []
 		redshift = []
 		wavenumber = []
@@ -177,40 +232,72 @@ class cl_21 (object):
 		T_T = np.interp(zz[::-1], self.z_HYREC[::-1], self.T_T[::-1])[::-1]
 		T_H = np.interp(zz[::-1], self.z_HYREC[::-1], self.T_H[::-1])[::-1]
 		T_b = np.interp(zz[::-1], self.z_HYREC[::-1], self.T_b[::-1])[::-1]
-		
-		for i in [self.number_of_k2-1]:
+			
+		#for i in [self.number_of_k2-1]:
+		for i in range(self.number_of_k2):
 			kk = self.klist2[::-1][i]
 			print (i, kk)
 			b = self.baryon[i*self.number_of_z2:(i+1)*self.number_of_z2]
 			b = np.interp (new_z[::-1], self.zlist2, b[::-1])[::-1]
 			b_dot = self.baryon_dot[i*self.number_of_z2:(i+1)*self.number_of_z2]*(-hubble_class)
 			b_dot = np.interp (new_z[::-1], self.zlist2, b_dot[::-1])[::-1] 
+			theta_b = -b_dot*(1+new_z)
+	
+			delta_x = [0]
+			delta_Tm = [0]
+			delta_x_ini = 0
+			delta_Tm_ini = 0
+			for i in range(len(new_z)-1):
+				dz = new_z[i]-new_z[i+1]
+				Alpha, Beta, R2p2s = interpolate_rates (Tr[i], Tm_Tr[i], logAlpha_tab,logR2p2s_tab, DTM_TR, DlogTR)
+	
+	
+				dlogAB_dlogTm = []
+				#for j in range(len(new_z)):
+				for j in [i-1, i, i+1]:
+					Alpha2, _, _ = interpolate_rates (Tr[i], Tm_Tr[j], logAlpha_tab,logR2p2s_tab,DTM_TR, DlogTR)
+					#Alpha2, _, _ = interpolate_rates (TR[j], TM_TR[j], logAlpha_tab,logR2p2s_tab)
+					dlogAB_dlogTm.append (np.log(Alpha2[0]+Alpha2[1]))
+				dlogAB_dlogTm = np.array (dlogAB_dlogTm)
+				#dlogAB_dlogTM = nn.derivative (TM[::-1], dlogAB_dlogTM[::-1])[::-1]
+				dlogAB_dlogTm = nn.derivative ([np.log(Tm[i-1]), np.log(Tm[i]), np.log(Tm[i+1])][::-1], dlogAB_dlogTm[::-1])[::-1]
+	
+				ddelta_Tm_dz = -1./(hubble[i]*(1.+new_z[i])) * ( gamma[i]*( (Tr[i]-Tm[i])/Tm[i]*delta_x_ini*0 - Tr[i]/Tm[i]*delta_Tm_ini) + 2./3.*(1.+new_z[i])*b_dot[i])
+				delta_Tm_ini -= ddelta_Tm_dz*dz
+				delta_Tm.append (delta_Tm_ini)
+
+				ddelta_x_dz = -1./(hubble[i]*(1.+new_z[i]))*x_dot[i]/x[i] * (delta_x_ini + b[i] + dlogAB_dlogTm[1] * delta_Tm_ini + dlogC_dlogRLya[i]*(theta_b[i]/(3.*hubble[i])-b[i]))
+				delta_x_ini -= ddelta_x_dz*dz
+				delta_x.append (delta_x_ini)
 			
-			C_list = [0]
-			dCdz_list = []
-			C = 0
-			for j in range(len(new_z)-1):
-				dz = new_z[j]-new_z[j+1]
-				dCdz = 1/((1+new_z[j])*hubble[j]*b[j]) * (-(1+new_z[j])*2/3*b_dot[j] + ((1+new_z[j])*b_dot[j]+Tr[j]/Tm[j]*gamma[j]*b[j])*C)
-				C -= dCdz*dz
-				dCdz_list.append (dCdz)
-				C_list.append (C)
-			C_list = np.array (C_list)
-			C1 = np.interp(zz[::-1], new_z[::-1], C_list[::-1])[::-1]
-		
-			transfer_21 = (T_H + T_T*C1)
+			#plt.figure(1)
+			#fig = plt.subplot(1,1,1)
+			#plt.xscale('log', basex=2)
+			#plt.plot(1+new_z, delta_Tm*(1+new_z), label = r'Without $\delta_{x_e}$')
+			#plt.xlabel (r'$1+z$', size = 15)
+			#plt.ylabel (r'$\delta_{T_\mathrm{gas}} (1+z)$', size = 15)
+			#fig.set_xticks([5,10,50,100,500])
+			#fig.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+			#plt.legend ()
+			#plt.show()
+
+			delta_Tm = np.interp(zz[::-1], new_z[::-1], delta_Tm[::-1])[::-1]
+
+			transfer_21 = T_H 
+			transfer_21_2 = delta_Tm
 			distortion = T_b
 			T21 += list(transfer_21)
+			T21_2 += list(transfer_21_2)
 			redshift_distortion += list(distortion)
 			redshift += list(zz)
 			wavenumber += list(np.ones(len(zz))*kk)
-		
 		self.T21 = np.array (T21)
+		self.T21_2 = np.array (T21_2)
 		self.redshift_distortion = np.array (redshift_distortion)
 		self.zlist = np.array (redshift)
 		wavenumber = np.array (wavenumber)
 		self.zz = zz	
-			
+		
 	def cl21T (self, z_m, w):
 		""" Calculate cross-correlation functions of ISW and 21 cm """
 
@@ -221,16 +308,27 @@ class cl_21 (object):
 		dphidz = np.loadtxt(self.infile_new)[0:,5]
 		T_dphidz = []
 		T_baryon = []
+		delta_21 = []
+		delta_21_2 = []
 		for i in range(self.number_of_k2):
 			p = dphidz[self.number_of_z2*i:self.number_of_z2*(i+1)][::-1]
 			T_dphidz.append (p)
 			bb = self.baryon[self.number_of_z2*i:self.number_of_z2*(i+1)][::-1]
 			T_baryon.append (bb)
+				
+			pp = self.T21[len(self.zz)*i:len(self.zz)*(i+1)][::-1]
+			delta_21.append (pp)
+			ppp = self.T21_2[len(self.zz)*i:len(self.zz)*(i+1)][::-1]
+			delta_21_2.append (ppp)
+	
+		zz = self.zz[::-1].copy ()
+		
 		T_dphidz = interp2d (self.zlist2, self.klist2, T_dphidz[::-1], kind = 'cubic')
 		T_baryon = interp2d (self.zlist2, self.klist2, T_baryon[::-1], kind = 'cubic')
+		delta_21 = interp2d (zz, self.klist2, delta_21[::-1], kind = 'cubic')
+		delta_21_2 = interp2d (zz, self.klist2, delta_21_2[::-1], kind = 'cubic')
 
-		delta_21 = self.T21[::-1].copy ()
-		zz = self.zz[::-1].copy ()
+		#delta_21 = self.T21[::-1].copy ()
 		cl_list = []
 		for l in self.l_list:
 			print (l)
@@ -240,9 +338,10 @@ class cl_21 (object):
 			transfer_21 = []
 			transfer_dphidz = []
 			for j in range(len(kk)):
-				T = np.interp (z[j], zz, delta_21)
+				T = delta_21 (z[j], kk[j])[0]			# not dependent on k, though
 				bb = T_baryon (z[j], kk[j])[0]
-				transfer_21.append (T*bb)
+				T_2 = delta_21_2 (z[j], kk[j])[0]
+				transfer_21.append (T*bb+T_2)
 				p = T_dphidz (z[j], kk[j])[0]
 				transfer_dphidz.append (p)
 			transfer_21 = np.array (transfer_21)

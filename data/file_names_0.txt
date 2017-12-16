@@ -1,0 +1,4 @@
+/Users/NanoomLee/Documents/Master@StonyBrook/ISW_21cm_Code/ISW_21cm/params_Yp_BBN/params_nonu.dat
+/Users/NanoomLee/Documents/Master@StonyBrook/ISW_21cm_Code/ISW_21cm/data/delta_syn_0.dat
+/Users/NanoomLee/Documents/Master@StonyBrook/ISW_21cm_Code/ISW_21cm/data/delta_new_0.dat
+/Users/NanoomLee/Documents/Master@StonyBrook/ISW_21cm_Code/ISW_21cm/data/output_prac_0.dat

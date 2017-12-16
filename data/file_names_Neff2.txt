@@ -1,0 +1,4 @@
+err_bar_plot/Neff2.dat
+/Users/NanoomLee/Documents/Master@StonyBrook/ISW_21cm_Code/ISW_21cm/data/delta_syn_Neff2.dat
+/Users/NanoomLee/Documents/Master@StonyBrook/ISW_21cm_Code/ISW_21cm/data/delta_new_Neff2.dat
+/Users/NanoomLee/Documents/Master@StonyBrook/ISW_21cm_Code/ISW_21cm/data/output_prac_Neff2.dat
