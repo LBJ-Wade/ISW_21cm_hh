@@ -183,7 +183,7 @@ class cl_21 (object):
 		z = self.z_HYREC.copy ()
 		x = self.x_HYREC.copy ()
 
-		new_z = np.linspace(1000,0,100000)
+		new_z = np.linspace(1000,0,20000)
 		x = np.interp (new_z[::-1], z[::-1], x[::-1])[::-1]
 		hubble = np.interp (new_z[::-1], self.zlist2, hubble_class[::-1])[::-1]
 		Tr = np.interp (new_z[::-1], z[::-1], self.Tr[::-1])[::-1]
@@ -284,7 +284,7 @@ class cl_21 (object):
 			delta_Tm = np.interp(zz[::-1], new_z[::-1], delta_Tm[::-1])[::-1]
 
 			transfer_21 = T_H 
-			transfer_21_2 = delta_Tm
+			transfer_21_2 = T_T * delta_Tm
 			distortion = T_b
 			T21 += list(transfer_21)
 			T21_2 += list(transfer_21_2)
@@ -297,7 +297,11 @@ class cl_21 (object):
 		self.zlist = np.array (redshift)
 		wavenumber = np.array (wavenumber)
 		self.zz = zz	
-		
+	
+		data = np.column_stack (( self.zlist, self.T21, self.T21_2 ))
+		np.savetxt('transfer_21.txt', data, fmt = '%1.6e')
+
+
 	def cl21T (self, z_m, w):
 		""" Calculate cross-correlation functions of ISW and 21 cm """
 
@@ -367,10 +371,24 @@ class cl_21 (object):
 		hubble_local = np.interp (z, self.zlist2, self.hubble_class)
 		
 		T_baryon = []
+		delta_21 = []
+		delta_21_2 = []
 		for i in range(self.number_of_k2):
 			bb = self.baryon[self.number_of_z2*i:self.number_of_z2*(i+1)][::-1]
 			T_baryon.append (bb)
+		
+			pp = self.T21[len(self.zz)*i:len(self.zz)*(i+1)][::-1]
+			delta_21.append (pp)
+			ppp = self.T21_2[len(self.zz)*i:len(self.zz)*(i+1)][::-1]
+			delta_21_2.append (ppp)
+		
+		zz = self.zz[::-1].copy ()
+		
 		T_baryon = interp2d (self.zlist2, self.klist2, T_baryon[::-1], kind = 'cubic')
+		delta_21 = interp2d (zz, self.klist2, delta_21[::-1], kind = 'cubic')
+		delta_21_2 = interp2d (zz, self.klist2, delta_21_2[::-1], kind = 'cubic')
+
+
 		
 		"""
 		delta_21 =[]
@@ -387,8 +405,7 @@ class cl_21 (object):
 		delta_21 = interp2d (zlist, klist, delta_21[::-1], kind = 'cubic')
 		distortion = interp2d (zlist, klist, distortion[::-1], kind = 'cubic')
 		"""
-		delta_21 = self.T21[::-1].copy ()
-		zz = self.zz[::-1].copy ()
+		#delta_21 = self.T21[::-1].copy ()
 
 		cl_list = []
 		for l in self.l_list:
@@ -398,9 +415,10 @@ class cl_21 (object):
 			
 			transfer_21 = []
 			for j in range(len(kk)):
-				T = np.interp (z[j], zz, delta_21)
+				T = delta_21 (z[j], kk[j])[0] 
 				bb = T_baryon (z[j], kk[j])[0]
-				transfer_21.append (T*bb)
+				T_2 = delta_21_2 (z[j], kk[j])[0]
+				transfer_21.append (T*bb + T_2)
 			transfer_21 = np.array (transfer_21)
 	
 			#integrand = 2.*np.pi**2/l**3 * kk**3*P_phi_local/(2*np.pi**2) * sel1 * sel2 * transfer_21**2 * chi_class_local * hubble_local
@@ -412,6 +430,118 @@ class cl_21 (object):
 		
 		return cl_list
 
+
+	def cl21_exact (self, z_m, w):
+		
+		z, sel, _ = sf.run_sel (w, z_m)
+
+		chi_class_local = np.interp (z, self.redshift2, self.chi_class)
+		hubble_local = np.interp (z, self.redshift2, self.hubble_class)
+		
+		#T21 = self.T21[0:self.number_of_z][::-1]
+		#redshift_distortion = self.redshift_distortion[0:self.number_of_z][::-1]
+		redshift_distortion = self.redshift_distortion[0:len(self.zz)][::-1]
+		
+		T_baryon = []
+		delta_21 = []
+		delta_21_2 = []
+		distortion = []
+		for i in range(self.number_of_k2):
+			bb = self.baryon[self.number_of_z2*i:self.number_of_z2*(i+1)][::-1]
+			T_baryon.append (bb)
+		
+			pp = self.T21[len(self.zz)*i:len(self.zz)*(i+1)][::-1]
+			delta_21.append (pp)
+			ppp = self.T21_2[len(self.zz)*i:len(self.zz)*(i+1)][::-1]
+			delta_21_2.append (ppp)
+		
+			distortion.append (redshift_distortion*bb)
+		
+		zz = self.zz[::-1].copy ()
+		
+		T_baryon = interp2d (self.zlist2, self.klist2, T_baryon[::-1], kind = 'cubic')
+		delta_21 = interp2d (zz, self.klist2, delta_21[::-1], kind = 'cubic')
+		delta_21_2 = interp2d (zz, self.klist2, delta_21_2[::-1], kind = 'cubic')
+		distortion = interp2d (zz, self.klist, distortion[::-1], kind = 'cubic')
+		
+		"""
+		delta_21 =[]
+		distortion = []
+		for i in range(number_of_k):
+			bb = baryon[number_of_z*i:number_of_z*(i+1)][::-1]
+				
+			#d = T21[number_of_z*i:number_of_z*(i+1)][::-1]
+			d = T21[number_of_z*(number_of_k-1):number_of_z*number_of_k][::-1]
+			d = d*bb
+			delta_21.append (d)
+			d = redshift_distortion[number_of_z*i:number_of_z*(i+1)][::-1]
+			d = d*bb
+			distortion.append (d)
+		delta_21 = interp2d (zlist, klist, delta_21[::-1], kind = 'cubic')
+		distortion = interp2d (zlist, klist, distortion[::-1], kind = 'cubic')
+		"""
+		
+		cl_list = []
+		for l in l_list:
+			print (l)
+			alpha_list = []
+			beta_list = []
+			
+			#P0_list = []
+			#P0v_list = []
+			#Pv_list = []
+			for j in range(len(self.k_list)):
+				jl = scipy.special.spherical_jn (int(l), self.k_list[j]*chi_class_local)
+				jl_2 = scipy.special.spherical_jn (int(l), self.k_list[j]*chi_class_local, 2) 
+				
+				T = delta_21 (z, self.k_list[j])[0]
+				T_2 = delta_21_2 (z, self.k_list[j])[0]
+				bb = T_baryon (z self.k_list[j])[0]
+
+				distor = distortion (z, self.k_list[j])[0]
+				alpha = simps (jl*sel*(T*bb + T_2), z)
+				beta = simps (jl_2*sel*distor, z)
+				
+				#transfer_21 = delta_21 (z_m, k_list[j])[0]
+				#distor = distortion (z_m, k_list[j])[0]
+				#alpha = simps (jl*sel, redshift)
+				#beta = simps (jl_2*sel, redshift)
+				alpha_list.append (alpha)
+				beta_list.append (beta)
+			
+				#P0 = P_phi[j]*transfer_21**2
+				#P0v = P_phi[j]*transfer_21*distor
+				#Pv = P_phi[j]*distor**2
+				#P0_list.append (P0)
+				#P0v_list.append (P0v)
+				#Pv_list.append (Pv)
+	
+			alpha_list = np.array (alpha_list)
+			beta_list = np.array (beta_list)
+			#P0_list = np.array (P0_list)
+			#P0v_list = np.array (P0v_list)
+			#Pv_list = np.array (Pv_list)
+	
+			integrand = 2/np.pi * self.P_phi * self.k_list**2 * (alpha_list**2 - 2*alpha_list*beta_list + beta_list**2)
+			#integrand1 = 2/np.pi * k_list**2 * (P0_list*alpha_list**2 + P0v_list*2*alpha_list*beta_list + Pv_list*beta_list**2)
+			#integrand1 = 2/np.pi * P_phi * k_list**2 * alpha_list**2
+			#integrand2 = 2/np.pi * P_phi * k_list**2 * 2*alpha_list*beta_list 
+			#integrand3 = 2/np.pi * P_phi * k_list**2 * beta_list**2
+			
+			cl = simps (integrand, self.k_list)
+			#cl_ab = simps (integrand2, k_list)
+			#cl_bb = simps (integrand3, k_list)
+			
+			cl_list.append (cl)
+			#cl_list_ab.append (cl_ab)
+			#cl_list_bb.append (cl_bb)
+	
+		cl_list = np.array (cl_list)
+		#cl_list_ab = np.array (cl_list_ab)
+		#cl_list_bb = np.array (cl_list_bb)
+		print (cl_list)
+		
+		return cl_list
 
 	def cl21_sharp (self, z_m, w):
 		
@@ -475,101 +605,6 @@ class cl_21 (object):
 		return cl_list
 
 
-
-	def cl21_exact (self, z_m, w):
-		
-		z, sel, _ = sf.run_sel (w, z_m)
-
-		chi_class_local = np.interp (z, self.redshift2, self.chi_class)
-		hubble_local = np.interp (z, self.redshift2, self.hubble_class)
-		
-		T21 = self.T21[0:self.number_of_z][::-1]
-		redshift_distortion = self.redshift_distortion[0:self.number_of_z][::-1]
-		
-		delta_21 =[]
-		distortion = []
-		for i in range(self.number_of_k2):
-			bb = self.baryon[self.number_of_z2*i:self.number_of_z2*(i+1)][::-1]
-			delta_21.append (T21*bb)
-			distortion.append (redshift_distortion*bb)
-		delta_21 = interp2d (self.zlist, self.klist, delta_21[::-1], kind = 'cubic')
-		distortion = interp2d (self.zlist, self.klist, distortion[::-1], kind = 'cubic')
-	
-		"""
-		delta_21 =[]
-		distortion = []
-		for i in range(number_of_k):
-			bb = baryon[number_of_z*i:number_of_z*(i+1)][::-1]
-				
-			#d = T21[number_of_z*i:number_of_z*(i+1)][::-1]
-			d = T21[number_of_z*(number_of_k-1):number_of_z*number_of_k][::-1]
-			d = d*bb
-			delta_21.append (d)
-			d = redshift_distortion[number_of_z*i:number_of_z*(i+1)][::-1]
-			d = d*bb
-			distortion.append (d)
-		delta_21 = interp2d (zlist, klist, delta_21[::-1], kind = 'cubic')
-		distortion = interp2d (zlist, klist, distortion[::-1], kind = 'cubic')
-		"""
-		
-		cl_list = []
-		for l in l_list:
-			print (l)
-			alpha_list = []
-			beta_list = []
-			
-			#P0_list = []
-			#P0v_list = []
-			#Pv_list = []
-			for j in range(len(self.k_list)):
-				jl = scipy.special.spherical_jn (int(l), self.k_list[j]*chi_class_local)
-				jl_2 = scipy.special.spherical_jn (int(l), self.k_list[j]*chi_class_local, 2) 
-				
-				transfer_21 = delta_21 (z, self.k_list[j])[0]
-				distor = distortion (z, self.k_list[j])[0]
-				alpha = simps (jl*sel*transfer_21, z)
-				beta = simps (jl_2*sel*distor, z)
-				
-				#transfer_21 = delta_21 (z_m, k_list[j])[0]
-				#distor = distortion (z_m, k_list[j])[0]
-				#alpha = simps (jl*sel, redshift)
-				#beta = simps (jl_2*sel, redshift)
-				alpha_list.append (alpha)
-				beta_list.append (beta)
-			
-				#P0 = P_phi[j]*transfer_21**2
-				#P0v = P_phi[j]*transfer_21*distor
-				#Pv = P_phi[j]*distor**2
-				#P0_list.append (P0)
-				#P0v_list.append (P0v)
-				#Pv_list.append (Pv)
-	
-			alpha_list = np.array (alpha_list)
-			beta_list = np.array (beta_list)
-			#P0_list = np.array (P0_list)
-			#P0v_list = np.array (P0v_list)
-			#Pv_list = np.array (Pv_list)
-	
-			integrand = 2/np.pi * self.P_phi * self.k_list**2 * (alpha_list**2 + 2*alpha_list*beta_list + beta_list**2)
-			#integrand1 = 2/np.pi * k_list**2 * (P0_list*alpha_list**2 + P0v_list*2*alpha_list*beta_list + Pv_list*beta_list**2)
-			#integrand1 = 2/np.pi * P_phi * k_list**2 * alpha_list**2
-			#integrand2 = 2/np.pi * P_phi * k_list**2 * 2*alpha_list*beta_list 
-			#integrand3 = 2/np.pi * P_phi * k_list**2 * beta_list**2
-			
-			cl = simps (integrand, self.k_list)
-			#cl_ab = simps (integrand2, k_list)
-			#cl_bb = simps (integrand3, k_list)
-			
-			cl_list.append (cl)
-			#cl_list_ab.append (cl_ab)
-			#cl_list_bb.append (cl_bb)
-	
-		cl_list = np.array (cl_list)
-		#cl_list_ab = np.array (cl_list_ab)
-		#cl_list_bb = np.array (cl_list_bb)
-		print (cl_list)
-		
-		return cl_list
 
 """
 #cl, cl2 = cl21 (z_m)
