@@ -462,7 +462,7 @@ class cl_21 (object):
 		T_baryon = interp2d (self.zlist2, self.klist2, T_baryon[::-1], kind = 'cubic')
 		delta_21 = interp2d (zz, self.klist2, delta_21[::-1], kind = 'cubic')
 		delta_21_2 = interp2d (zz, self.klist2, delta_21_2[::-1], kind = 'cubic')
-		distortion = interp2d (zz, self.klist, distortion[::-1], kind = 'cubic')
+		distortion = interp2d (zz, self.klist2, distortion[::-1], kind = 'cubic')
 		
 		"""
 		delta_21 =[]
@@ -490,15 +490,15 @@ class cl_21 (object):
 			#P0_list = []
 			#P0v_list = []
 			#Pv_list = []
-			for j in range(len(self.k_list)):
-				jl = scipy.special.spherical_jn (int(l), self.k_list[j]*chi_class_local)
-				jl_2 = scipy.special.spherical_jn (int(l), self.k_list[j]*chi_class_local, 2) 
+			for j in range(len(self.k_list2)):
+				jl = scipy.special.spherical_jn (int(l), self.k_list2[j]*chi_class_local)
+				jl_2 = scipy.special.spherical_jn (int(l), self.k_list2[j]*chi_class_local, 2) 
 				
-				T = delta_21 (z, self.k_list[j])[0]
-				T_2 = delta_21_2 (z, self.k_list[j])[0]
-				bb = T_baryon (z self.k_list[j])[0]
+				T = delta_21 (z, self.k_list2[j])[0]
+				T_2 = delta_21_2 (z, self.k_list2[j])[0]
+				bb = T_baryon (z, self.k_list2[j])[0]
 
-				distor = distortion (z, self.k_list[j])[0]
+				distor = distortion (z, self.k_list2[j])[0]
 				alpha = simps (jl*sel*(T*bb + T_2), z)
 				beta = simps (jl_2*sel*distor, z)
 				
@@ -522,13 +522,13 @@ class cl_21 (object):
 			#P0v_list = np.array (P0v_list)
 			#Pv_list = np.array (Pv_list)
 	
-			integrand = 2/np.pi * self.P_phi * self.k_list**2 * (alpha_list**2 - 2*alpha_list*beta_list + beta_list**2)
+			integrand = 2/np.pi * self.P_phi * self.k_list2**2 * (alpha_list**2 - 2*alpha_list*beta_list + beta_list**2)
 			#integrand1 = 2/np.pi * k_list**2 * (P0_list*alpha_list**2 + P0v_list*2*alpha_list*beta_list + Pv_list*beta_list**2)
 			#integrand1 = 2/np.pi * P_phi * k_list**2 * alpha_list**2
 			#integrand2 = 2/np.pi * P_phi * k_list**2 * 2*alpha_list*beta_list 
 			#integrand3 = 2/np.pi * P_phi * k_list**2 * beta_list**2
 			
-			cl = simps (integrand, self.k_list)
+			cl = simps (integrand, self.k_list2)
 			#cl_ab = simps (integrand2, k_list)
 			#cl_bb = simps (integrand3, k_list)
 			
