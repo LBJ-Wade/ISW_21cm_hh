@@ -8,7 +8,7 @@ import sys
 import matplotlib.ticker
 from tools import *
 from path import *
-import nanoom as nn
+import derivative as dv
 
 def set_cl_21 (tag, Yp_BBN):		# At the end, it would take z_m_list, w_list as arguments
 	""" Construct object of class cl_21 """
@@ -219,7 +219,7 @@ class cl_21 (object):
 		RLya = 4.662899067555897e15 *hubble /n_H/(1.-x)
 		#RLya = 4.662899067555897e15 *(Hubble + theta_b/3.) /n_H/(1.-x)
 		C = (3*RLya + L2s1s)/(3*RLya + L2s1s + 4*Beta_)
-		dlogC_dlogRLya = -nn.derivative (np.log(RLya), np.log(C))
+		dlogC_dlogRLya = -dv.derivative (np.log(RLya), np.log(C))
 
 		x_dot = -C*AB*n_H*x**2
 
@@ -259,8 +259,8 @@ class cl_21 (object):
 					#Alpha2, _, _ = interpolate_rates (TR[j], TM_TR[j], logAlpha_tab,logR2p2s_tab)
 					dlogAB_dlogTm.append (np.log(Alpha2[0]+Alpha2[1]))
 				dlogAB_dlogTm = np.array (dlogAB_dlogTm)
-				#dlogAB_dlogTM = nn.derivative (TM[::-1], dlogAB_dlogTM[::-1])[::-1]
-				dlogAB_dlogTm = nn.derivative ([np.log(Tm[i-1]), np.log(Tm[i]), np.log(Tm[i+1])][::-1], dlogAB_dlogTm[::-1])[::-1]
+				#dlogAB_dlogTM = dv.derivative (TM[::-1], dlogAB_dlogTM[::-1])[::-1]
+				dlogAB_dlogTm = dv.derivative ([np.log(Tm[i-1]), np.log(Tm[i]), np.log(Tm[i+1])][::-1], dlogAB_dlogTm[::-1])[::-1]
 	
 				ddelta_Tm_dz = -1./(hubble[i]*(1.+new_z[i])) * ( gamma[i]*( (Tr[i]-Tm[i])/Tm[i]*delta_x_ini*0 - Tr[i]/Tm[i]*delta_Tm_ini) + 2./3.*(1.+new_z[i])*b_dot[i])
 				delta_Tm_ini -= ddelta_Tm_dz*dz
