@@ -10,7 +10,7 @@ class prior_cmb (object):		# Need to add cl^dd
 			self.params_input = self.params_path + "/params_nonu.dat"
 			self.params_list = np.loadtxt (self.params_input)[0:,]
 			self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
-			self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu']
+			#self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu']
 			self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.02, 0.08]
 			#self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.08]
 		else:
@@ -86,7 +86,6 @@ class prior_cmb (object):		# Need to add cl^dd
 			outfile = path_data + "/cl_" + tag + ".dat"
 		
 		l = np.loadtxt (outfile)[28:4999,0]
-		print (l[0], l[-1])
 		clTT_N = (2*0.000290888)**2 *np.e**(l*(l+1)*(0.000290888**2)/(8*np.log(2)))
 		clEE_N = 2*clTT_N
 		self.l_list = l
@@ -98,7 +97,7 @@ class prior_cmb (object):		# Need to add cl^dd
 		clEE += clEE_N
 		
 		cldd = np.loadtxt (outfile)[28:4999,5]
-		infile_noise = default + "/Nldd_2muKarcmin_1arcmin.txt"
+		infile_noise = default + "/source/Nldd_2muKarcmin_1arcmin.txt"
 		N = np.loadtxt (infile_noise)[28:4999,1]	
 		N = N*l*(l+1)/(2*np.pi)
 		cldd += N

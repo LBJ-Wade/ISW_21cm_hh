@@ -388,25 +388,6 @@ class cl_21 (object):
 		delta_21 = interp2d (zz, self.klist2, delta_21[::-1], kind = 'cubic')
 		delta_21_2 = interp2d (zz, self.klist2, delta_21_2[::-1], kind = 'cubic')
 
-
-		
-		"""
-		delta_21 =[]
-		distortion = []
-		for i in range(number_of_k):
-			bb = self.baryon[number_of_z*i:number_of_z*(i+1)][::-1]
-
-			d = self.T21[number_of_z*(number_of_k-1):number_of_z*number_of_k][::-1]
-			d = d*bb
-			delta_21.append (d)
-			d = self.redshift_distortion[number_of_z*i:number_of_z*(i+1)][::-1]
-			d = d*bb
-			distortion.append (d)
-		delta_21 = interp2d (zlist, klist, delta_21[::-1], kind = 'cubic')
-		distortion = interp2d (zlist, klist, distortion[::-1], kind = 'cubic')
-		"""
-		#delta_21 = self.T21[::-1].copy ()
-
 		cl_list = []
 		for l in self.l_list:
 			print (l)
@@ -421,7 +402,6 @@ class cl_21 (object):
 				transfer_21.append (T*bb + T_2)
 			transfer_21 = np.array (transfer_21)
 	
-			#integrand = 2.*np.pi**2/l**3 * kk**3*P_phi_local/(2*np.pi**2) * sel1 * sel2 * transfer_21**2 * chi_class_local * hubble_local
 			integrand = P_phi_local * sel1 * sel2 * transfer_21**2 * hubble_local /chi_class_local**2
 			cl = simps (integrand, z)
 			cl_list.append (cl)
@@ -603,55 +583,4 @@ class cl_21 (object):
 		cl_list = np.array (cl_list)
 		print (cl_list)
 		return cl_list
-
-
-
-"""
-#cl, cl2 = cl21 (z_m)
-cl, cl2 = cl21T (z_m)
-data = np.column_stack((l_list, cl2, cl))
-#np.savetxt('cl_21cm_l10^7_6MHz_fix.txt', data, fmt = '%1.6e')
-np.savetxt(outfile, data, fmt = '%1.6e')
-#np.savetxt('result/antony/nanoom/21T_nu2_{}.txt'.format(z_m), data, fmt = '%1.6e')
-#print ('21T_nu2_{}.txt'.format(z_m))
-aa = 2.7255*10**6
-plt.plot (l_list, np.sqrt(aa*cl*l_list*(l_list+1)/(2*np.pi)), label = 'limber2')
-plt.plot (l_list, np.sqrt(aa*cl2*l_list*(l_list+1)/(2*np.pi)), label = 'limber')
-#plt.plot (l_list, np.sqrt(aa*mono/l_list), label = 'mono')
-#plt.plot (l_list, np.sqrt(aa*monovel/l_list), label = 'monovel')
-#plt.plot (l_list, np.sqrt(aa*vel/l_list), label = 'vel')
-#plt.plot (l_list, np.sqrt(aa*(mono+monovel+vel)/l_list), label = 'approx')
-plt.legend ()
-#plt.axis([2,10**7,10**-3,10])
-plt.xscale ('log')
-plt.yscale ('log')
-"""
-"""
-aa = 2.7255*10**6
-#cl = cl21_sharp ()
-#cl, ab, bb = cl21_exact ()
-cl = cl21_exact ()
-#data = np.column_stack((l_list, cl,ab,bb))
-data = np.column_stack((l_list, cl))
-#np.savetxt('result/antony/antony_sharp_10000.txt', data, fmt = '%1.6e')
-#print ('antony_sharp.txt, 10000')
-np.savetxt('result/antony/antony_6MHz_5000.txt', data, fmt = '%1.6e')
-print ('antony_exact_6MHz_5000.txt')
-#print ('antony_exact_6MHz_100000, l=2, not saved')
-
-#np.savetxt('cl_21cm_l10^7_exact_novel_01MHz.txt', data, fmt = '%1.6e')
-#np.savetxt('cl_21cm_l10^7_sharp2.txt', data, fmt = '%1.6e')
-aa = 2.7255*10**6
-plt.plot (l_list, np.sqrt(aa*cl*l_list*(l_list+1)/(2*np.pi)), label = 'aa')
-#plt.plot (l_list, np.sqrt(aa*ab*l_list*(l_list+1)/(2*np.pi)), label = 'ab')
-#plt.plot (l_list, np.sqrt(aa*bb*l_list*(l_list+1)/(2*np.pi)), label = 'bb')
-#plt.plot (l_list, np.sqrt(aa*cl*l_list*(l_list+1)/(2*np.pi)), label = 'sharp')
-plt.legend ()
-plt.axis([2,10**7,10**-3,10])
-plt.xscale ('log')
-plt.yscale ('log')
-
-print (np.sqrt(aa*cl*l_list*(l_list+1)/(2*np.pi)))
-plt.show()
-"""
 
