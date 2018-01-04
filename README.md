@@ -6,7 +6,7 @@ This program is a part of Master research advised by Prof. Marilena Loverde at S
 * `class_new`
   - CLASS in newtonian gauge
 * `data`
-  - 
+   
 * `params_Yp`
 
 * `params_Yp_BBN`
