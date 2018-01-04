@@ -7,7 +7,7 @@ class prior_cmb (object):		# Need to add cl^dd
 		self.Yp_BBN = Yp_BBN
 		if self.Yp_BBN == True:
 			self.params_path = path_params_Yp_BBN
-			self.params_input = self.params_path + "/params_nonu.dat"
+			self.params_input = self.params_path + "/params_fid.dat"
 			self.params_list = np.loadtxt (self.params_input)[0:,]
 			self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
 			#self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu']
@@ -15,7 +15,7 @@ class prior_cmb (object):		# Need to add cl^dd
 			#self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.08]
 		else:
 			self.params_path = path_params_Yp
-			self.params_input = self.params_path + "/params_nonu.dat"
+			self.params_input = self.params_path + "/params_fid.dat"
 			self.params_list = np.loadtxt (self.params_input)[0:,]
 			self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff', 'Yp']
 			self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.02, 0.08, 0.0048]
@@ -229,14 +229,14 @@ class fisher (object):
 		self.Yp_BBN = Yp_BBN	
 		if self.Yp_BBN == True:
 			self.params_path = path_params_Yp_BBN
-			self.params_input = self.params_path + "/params_nonu.dat"
+			self.params_input = self.params_path + "/params_fid.dat"
 			self.params_list = np.loadtxt (self.params_input)[0:,]
 			self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
 			self.stepsize = [0.0030, 8.0e-4, 5.0e-3, 0.02, 0.045, 0.01, 0.02, 0.08]
 			self.path_result = path_result_Yp_BBN	
 		else:
 			self.params_path = path_params_Yp
-			self.params_input = self.params_path + "/params_nonu.dat"
+			self.params_input = self.params_path + "/params_fid.dat"
 			self.params_list = np.loadtxt (self.params_input)[0:,]
 			self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff', 'Yp']
 			self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.02, 0.08, 0.0048]
