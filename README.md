@@ -26,6 +26,7 @@ This program is a part of Master research advised by Prof. Marilena Loverde at S
   - The auto- and cross-correlation of 21cm fluctuations and ISW effect are saved using parameters in params_Yp_BBN.
 * `source`
   - Contains main source files.
+* `updateparams.py`: this updates CLASS ini file (params_prac_.ini) using parameters in params_Yp and params_Yp_BBN.
 
 ## Source files
 * `source/`
