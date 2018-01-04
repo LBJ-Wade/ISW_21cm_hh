@@ -9,9 +9,9 @@ This program is a part of Master research advised by Prof. Marilena Loverde at S
 ## List of folders
 
 * `class_syn`
-  - CLASS in syncronouse gauge
+  - CLASS in syncronouse gauge.
 * `class_new`
-  - CLASS in newtonian gauge
+  - CLASS in newtonian gauge.
 * `data`
   - This is a folder to save data from CLASS such as transfer functions, CMB power spectrums, and free electron fraction.   
 * `params_Yp`
@@ -47,5 +47,5 @@ This program is a part of Master research advised by Prof. Marilena Loverde at S
 
 ## How to run
 
-* `run_fisher.py`: choose between CMB and 21cm and also condition for Yp. Result (fisher matrix and constraints of cosmological parameters) will be saved in `result` folder.
+* `run_fisher.py`: choose between CMB and 21cm and also condition for Yp. Results (fisher matrix and constraints of cosmological parameters) will be saved in `result` folder.
 
