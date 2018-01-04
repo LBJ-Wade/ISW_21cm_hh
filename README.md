@@ -6,17 +6,17 @@ This program is a part of Master research advised by Prof. Marilena Loverde at S
 * `class_new`
   - CLASS in newtonian gauge
 * `data`
-   
+  - This is a folder to save data from CLASS such as transfer functions, CMB power spectrums, and free electron fraction.   
 * `params_Yp`
-
+  - Sets of cosmological parameters for Fisher analysis. Yp is also one of parameters.
 * `params_Yp_BBN`
-
+  - Sets of cosmological parameters for Fisher analysis. Yp is fixed by BBN constraint. See Eq. (70) in Planck 2015 results. XIII.
 * `result`
-
+  - In this folder, the fisher matrix and the constraints from Fisher analysis are saved.
 * `result_Yp`
-
+  - The auto- and cross-correlation of 21cm fluctuations and ISW effect are saved using parameters in params_Yp.
 * `result_Yp_BBN`
-
+  - The auto- and cross-correlation of 21cm fluctuations and ISW effect are saved using parameters in params_Yp_BBN.
 * `source`
 
 * `run_fisher.py`
