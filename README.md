@@ -43,7 +43,7 @@ This program is a part of Master research advised by Prof. Marilena Loverde at S
   
   - `tools.py`: this contains functions to interpolate recombination coefficient from table given in HyRec code. Its original file is hydrogen.c of HyRec code.
   
-  - `updateparams.py`: this updates CLASS ini file (params_prac_.ini) using parameters in params_Yp and params_Yp_BBN.
+  - `updateparams.py`: this updates CLASS ini file (params_prac_.ini) using parameters in `params_Yp` and `params_Yp_BBN`.
 
 ## How to run
 
