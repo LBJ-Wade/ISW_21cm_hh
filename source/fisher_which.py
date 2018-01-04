@@ -12,13 +12,13 @@ def run (cmb_or_21, Yp_BBN):
 		if Yp_BBN == True:
 			data = np.column_stack ((fisher_matrix[0], fisher_matrix[1], fisher_matrix[2], \
 			                         fisher_matrix[3], fisher_matrix[4], fisher_matrix[5], \
-									 fisher_matrix[6], fisher_matrix[7]))
+			                         fisher_matrix[6], fisher_matrix[7]))
 			np.savetxt('result/fisher_matrix_cl21T_BBN.txt', data, fmt = '%1.20e')
 
 		elif Yp_BBN == False:
 			data = np.column_stack ((fisher_matrix[0], fisher_matrix[1], fisher_matrix[2], \
 			                         fisher_matrix[3], fisher_matrix[4], fisher_matrix[5], \
-									 fisher_matrix[6], fisher_matrix[7], fisher_matrix[8]))
+			                         fisher_matrix[6], fisher_matrix[7], fisher_matrix[8]))
 			np.savetxt('result/fisher_matrix_cl21T.txt', data, fmt = '%f')
 		
 		else:
@@ -47,13 +47,13 @@ def run (cmb_or_21, Yp_BBN):
 		if Yp_BBN == True:
 			data = np.column_stack ((fisher_matrix[0], fisher_matrix[1], fisher_matrix[2], \
 			                         fisher_matrix[3], fisher_matrix[4], fisher_matrix[5], \
-									 fisher_matrix[6], fisher_matrix[7]))
+			                         fisher_matrix[6], fisher_matrix[7]))
 			np.savetxt('result/fisher_matrix_BBN.txt', data, fmt = '%f')
 	
 		elif Yp_BBN == False:
 			data = np.column_stack ((fisher_matrix[0], fisher_matrix[1], fisher_matrix[2], \
 			                         fisher_matrix[3], fisher_matrix[4], fisher_matrix[5], \
-									 fisher_matrix[6], fisher_matrix[7], fisher_matrix[8]))
+			                         fisher_matrix[6], fisher_matrix[7], fisher_matrix[8]))
 			np.savetxt('result/fisher_matrix.txt', data, fmt = '%f')
 
 		else:
@@ -75,4 +75,3 @@ def run (cmb_or_21, Yp_BBN):
 	else:
 		print 'Keyword Error in run_fisher.py'
 		return None
-
