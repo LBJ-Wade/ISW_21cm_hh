@@ -27,9 +27,15 @@ This program is a part of Master research advised by Prof. Marilena Loverde at S
 * `source`
   - Contains main source files.
 
-## Structure and source files.
+## Source files
 * `source/`
-  - `path.py`:
+  - `path.py`: this defines paths of every folder.
+  - `selection_function21cm.py`: this defines selection functions for the obversed frequency of 21 cm fluctuations.
+  - `run.py`: this runs CLASS code to get transfer functions, CMB power spectrums, and free electron fraction. It has two functions each of which is for Fisher analysis with CMB or 21cm.
+  - `cl_21.py`: this calculates auto- and cross-correlation functions of 21cm using data from CLASS.
+  - `fisher.py`: this does Fisher analysis for CMB and 21cm.
+  - 'fisher_which.py`' this determines which Fisher analysis will be done (CMB or 21cm) and which conditions for Yp (BBN constraint or not) will be considered.
+  - `tools.py`: this contains functions to interpolate recombination coefficient from table given in HyRec code. Its original file is hydrogen.c of HyRec code.
 
 ## How to run
 
