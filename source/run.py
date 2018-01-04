@@ -11,13 +11,18 @@ def run_cmb (params_list, tag, Yp_BBN = True):
 	oldfile = "params_prac_.ini"
 	newfile = "params_prac2_.ini"
 	clfile = "params_prac_cl.dat"
-	clout = path_data + "/cl_" + tag + ".dat"
+	if Yp_BBN:
+		clout = path_data + "/cl_" + tag + "_BBN.dat"
+	else:
+		clout = path_data + "/cl_" + tag + ".dat"
 	setparamsfile_CLASS (params_list, oldfile, newfile, Yp_BBN)
-	call ('./class {0} {1}'.format (newfile, "cl_ref.pre"), shell = True)	
+	#call ('./class {0} {1}'.format (newfile, "cl_ref.pre"), shell = True)	
+	call ('./class {0} '.format (newfile, "cl_ref.pre"), shell = True)	
 	os.chdir ("output")
 	os.system ("cp {0} {1}".format (clfile, clout))
 
 	os.system ("rm *")
+	os.chdir ("../")
 	os.chdir ("../")
 	os.chdir ("../")
 	
@@ -55,6 +60,7 @@ def run_21cm (params_list, params_input, tag, Yp_BBN = True):
 	os.system ("rm *")
 	os.chdir ("../")
 	os.chdir ("../")
+	os.chdir ("../")
 	
 	# Run CLASS (newtonian gauge)
 	os.chdir (path_CLASS_new)
@@ -66,6 +72,7 @@ def run_21cm (params_list, params_input, tag, Yp_BBN = True):
 	outfile_new = path_data + "/delta_new_{0}.dat".format (tag)
 	os.system ("cp delta.dat {0}".format (outfile_new))
 	os.system ("rm *")
+	os.chdir ("../")
 	os.chdir ("../")
 	os.chdir ("../")
 	
@@ -85,8 +92,3 @@ def run_21cm (params_list, params_input, tag, Yp_BBN = True):
 	file_names = np.array ([params_input, outfile_syn, outfile_new, outfile_HYREC])
 	np.savetxt (path_data + '/file_names_{0}.txt'.format (tag), file_names, fmt="%s")
 		
-# Load cosmological parameters
-#params_list = np.loadtxt (params_input)[0:,]
-#tag = "baryon"
-#run_21cm (params_list, tag)
-#run (params_list, '0')
