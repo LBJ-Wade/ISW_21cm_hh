@@ -6,7 +6,7 @@ This program is a part of Master research advised by Prof. Marilena Loverde at S
 * 'default' in /source/path.py should be changed to be a path of 'ISW_21cm' folder in the machine.
 * Should do 'make' in both 'class_syn' and 'class_new' folder.
 
-## List of main folders
+## List of folders
 
 * `class_syn`
   - CLASS in syncronouse gauge
@@ -25,6 +25,11 @@ This program is a part of Master research advised by Prof. Marilena Loverde at S
 * `result_Yp_BBN`
   - The auto- and cross-correlation of 21cm fluctuations and ISW effect are saved using parameters in params_Yp_BBN.
 * `source`
+  - Contains main source files.
+
+## Structure and source files.
+* `source/`
+  - `path.py`:
 
 ## How to run
 
