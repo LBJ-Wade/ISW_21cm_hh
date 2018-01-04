@@ -10,5 +10,3 @@ path_params_Yp = default + "/params_Yp"
 result_Yp_BBN = default + "/result_Yp_BBN"
 result_Yp = default + "/result_Yp"
 
-#params_input = default + "/params_nonu.dat"
-
