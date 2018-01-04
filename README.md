@@ -1,5 +1,5 @@
 # ISW_21cm
-This program is a part of Master research advised by Prof. Marilena Loverde at Stony Brook University. The goal of this program is constraining cosmological parameters by Fisher analysis using the cross-correlation functions of Integrated Sachs-Wolfe effect and 21cm brightness temperature fluctuations at dark ages.
+This program is a part of Master research advised by Prof. Marilena Loverde at Stony Brook University. The goal of this program is constraining cosmological parameters by Fisher analysis using the cross-correlation functions of Integrated Sachs-Wolfe effect and 21cm brightness temperature fluctuations at dark ages. A paper containing results of this program is in preparation.
 
 ## Getting started
 * This program is written with python 2.7.
