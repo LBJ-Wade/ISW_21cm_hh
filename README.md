@@ -3,7 +3,7 @@ This program is a part of Master research advised by Prof. Marilena Loverde at S
 
 ## Getting started
 * This program is written with python 2.7.
-* 'default' in /source/path.py should be changed to be a path of 'ISW_21cm' folder in the machine.
+* `default` in /source/path.py should be changed to be a path of 'ISW_21cm' folder in the machine.
 * Should do 'make' in both 'class_syn' and 'class_new' folders.
 
 ## List of folders
