@@ -1,6 +1,13 @@
 # ISW_21cm
 This program is a part of Master research advised by Prof. Marilena Loverde at Stony Brook University. The goal of this program is constraining cosmological parameters by Fisher analysis using the cross-correlation functions of Integrated Sachs-Wolfe effect and 21cm brightness temperature fluctuations at dark ages.
 
+## Getting started
+* This program is written with python 2.7.
+* 'default' in /source/path.py should be changed to be a path of 'ISW_21cm' folder in the machine.
+* Should do 'make' in both 'class_syn' and 'class_new' folder.
+
+## List of main folders
+
 * `class_syn`
   - CLASS in syncronouse gauge
 * `class_new`
@@ -19,10 +26,7 @@ This program is a part of Master research advised by Prof. Marilena Loverde at S
   - The auto- and cross-correlation of 21cm fluctuations and ISW effect are saved using parameters in params_Yp_BBN.
 * `source`
 
+## How to run
+
 * `run_fisher.py`
 
-# Before running codes
-1. 'default' in /source/path.py should be changed to be a path of 'ISW_21cm' folder in the machine.
-2. Should do 'make' in both 'class_syn' and 'class_new' folder.
-
-# How to run
