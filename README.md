@@ -47,5 +47,5 @@ This program is a part of Master research advised by Prof. Marilena Loverde at S
 
 ## How to run
 
-* `run_fisher.py`
+* `run_fisher.py`: choose between CMB and 21cm and also condition for Yp. Result (fisher matrix and constraint of cosmological parameters) will be saved in `result` folder.
 
