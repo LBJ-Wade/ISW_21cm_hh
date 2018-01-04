@@ -19,6 +19,8 @@ This program is a part of Master research advised by Prof. Marilena Loverde at S
 
 * `source/`
 
+* `run_fisher.py`
+
 # Before running codes
 1. 'default' in /source/path.py should be changed to be a path of 'ISW_21cm' folder in the machine.
 2. Should do 'make' in both 'class_syn' and 'class_new' folder.
