@@ -9,9 +9,11 @@ class prior_cmb (object):		# Need to add cl^dd
 			self.params_path = path_params_Yp_BBN
 			self.params_input = self.params_path + "/params_fid.dat"
 			self.params_list = np.loadtxt (self.params_input)[0:,]
-			self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
+			#self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu','Neff']
+			self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','Neff']
 			#self.fisher_params = ['c','b','theta','tau', 'A_s','n_s','m_nu']
-			self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.02, 0.08]
+			#self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.02, 0.08]
+			self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.08]
 			#self.stepsize = [0.0030, 8.0e-4, 5.0e-5, 0.02, 0.045, 0.01, 0.08]
 		else:
 			self.params_path = path_params_Yp
@@ -42,7 +44,7 @@ class prior_cmb (object):		# Need to add cl^dd
 			params_list_copy = np.loadtxt (infile2)[0:,] 
 			tag = param + "2"
 			outfile2 = run_cmb (params_list_copy, tag, self.Yp_BBN)
-			"""
+			"""	
 			if self.Yp_BBN == True:
 				outfile1 = path_data + "/cl_" + param+"1" + "_BBN.dat"
 				outfile2 = path_data + "/cl_" + param+"2" + "_BBN.dat"
@@ -51,15 +53,15 @@ class prior_cmb (object):		# Need to add cl^dd
 				outfile2 = path_data + "/cl_" + param+"2" + ".dat"
 			
 			dev_cl = {}
-			l = np.loadtxt (outfile1)[28:4999,0]
-			clTT1 = np.loadtxt (outfile1)[28:4999,1] / (l*(l+1)/(2*np.pi)) 
-			clTT2 = np.loadtxt (outfile2)[28:4999,1] / (l*(l+1)/(2*np.pi)) 
-			clTE1 = np.loadtxt (outfile1)[28:4999,4] / (l*(l+1)/(2*np.pi)) 
-			clTE2 = np.loadtxt (outfile2)[28:4999,4] / (l*(l+1)/(2*np.pi)) 
-			clEE1 = np.loadtxt (outfile1)[28:4999,2] / (l*(l+1)/(2*np.pi)) 
-			clEE2 = np.loadtxt (outfile2)[28:4999,2] / (l*(l+1)/(2*np.pi)) 
-			cldd1 = np.loadtxt (outfile1)[28:4999,5] / (l*(l+1)/(2*np.pi)) 
-			cldd2 = np.loadtxt (outfile2)[28:4999,5] / (l*(l+1)/(2*np.pi))
+			l = np.loadtxt (outfile1)[0:4999,0]
+			clTT1 = np.loadtxt (outfile1)[0:4999,1] / (l*(l+1)/(2*np.pi)) 
+			clTT2 = np.loadtxt (outfile2)[0:4999,1] / (l*(l+1)/(2*np.pi)) 
+			clTE1 = np.loadtxt (outfile1)[0:4999,4] / (l*(l+1)/(2*np.pi)) 
+			clTE2 = np.loadtxt (outfile2)[0:4999,4] / (l*(l+1)/(2*np.pi)) 
+			clEE1 = np.loadtxt (outfile1)[0:4999,2] / (l*(l+1)/(2*np.pi)) 
+			clEE2 = np.loadtxt (outfile2)[0:4999,2] / (l*(l+1)/(2*np.pi)) 
+			cldd1 = np.loadtxt (outfile1)[0:4999,5] / (l*(l+1)/(2*np.pi)) 
+			cldd2 = np.loadtxt (outfile2)[0:4999,5] / (l*(l+1)/(2*np.pi))
 			
 			dev_clTT = (clTT2-clTT1)/(2*stepsize)
 			dev_clTE = (clTE2-clTE1)/(2*stepsize)
@@ -80,31 +82,32 @@ class prior_cmb (object):		# Need to add cl^dd
 		tag = "0"
 		
 		#outfile = run_cmb (self.params_list, tag, self.Yp_BBN)
+		
 		if self.Yp_BBN == True:
 			outfile = path_data + "/cl_" + tag + "_BBN.dat"
 		else:
 			outfile = path_data + "/cl_" + tag + ".dat"
 		
-		l = np.loadtxt (outfile)[28:4999,0]
+		l = np.loadtxt (outfile)[0:4999,0]
 		clTT_N = (2*0.000290888)**2 *np.e**(l*(l+1)*(0.000290888**2)/(8*np.log(2)))
 		clEE_N = 2*clTT_N
 		self.l_list = l
 		
-		clTT = np.loadtxt (outfile)[28:4999,1] / (l*(l+1)/(2*np.pi)) 
+		clTT = np.loadtxt (outfile)[0:4999,1] / (l*(l+1)/(2*np.pi)) 
 		clTT += clTT_N
-		clTE = np.loadtxt (outfile)[28:4999,4] / (l*(l+1)/(2*np.pi)) 
-		clEE = np.loadtxt (outfile)[28:4999,2] / (l*(l+1)/(2*np.pi)) 
+		clTE = np.loadtxt (outfile)[0:4999,4] / (l*(l+1)/(2*np.pi)) 
+		clEE = np.loadtxt (outfile)[0:4999,2] / (l*(l+1)/(2*np.pi)) 
 		clEE += clEE_N
 		
-		cldd = np.loadtxt (outfile)[28:4999,5]
+		cldd = np.loadtxt (outfile)[0:4999,5]
 		infile_noise = default + "/source/Nldd_2muKarcmin_1arcmin.txt"
-		N = np.loadtxt (infile_noise)[28:4999,1]	
+		N = np.loadtxt (infile_noise)[0:4999,1]	
 		N = N*l*(l+1)/(2*np.pi)
 		cldd += N
 		cldd = cldd / (l*(l+1)/(2*np.pi))
 		
-		clTd = np.loadtxt (outfile)[28:4999,6] / (l*(l+1)/(2*np.pi))
-		clEd = np.loadtxt (outfile)[28:4999,7] / (l*(l+1)/(2*np.pi))
+		clTd = np.loadtxt (outfile)[0:4999,6] / (l*(l+1)/(2*np.pi))
+		clEd = np.loadtxt (outfile)[0:4999,7] / (l*(l+1)/(2*np.pi))
 		
 		cov['11'] = 2 * clTT**2 / (2*l+1) /f_sky
 		cov['22'] = (clTT*clEE + clTE**2) / (2*l+1) /f_sky
@@ -133,7 +136,8 @@ class prior_cmb (object):		# Need to add cl^dd
 				param_m = self.fisher_params[m]
 				param_n = self.fisher_params[n]
 				
-				for ll in range(2971):
+				#for ll in range(2971):
+				for ll in range(28,2999):
 					vec_m = np.zeros(4)
 					vec_n = np.zeros(4)
 					inv_cov = np.zeros([4,4])
@@ -192,7 +196,8 @@ class prior_cmb (object):		# Need to add cl^dd
 					F_mn += np.dot(vec_m, np.dot(inv_cov, vec_n))
 				"""
 				
-				for ll in range(2971,4971):
+				#for ll in range(2971,4971):
+				for ll in range(2999,4999):
 					
 					vec_m = np.zeros(3)
 					vec_n = np.zeros(3)
@@ -221,6 +226,52 @@ class prior_cmb (object):		# Need to add cl^dd
 				F[m,n] = F_mn
 		return F
 
+	def prior_planck (self):
+		print ('Start prior_planck')
+		
+		F = np.zeros([len(self.fisher_params),len(self.fisher_params)])
+		for m in range(len(self.fisher_params)):
+			for n in range(len(self.fisher_params)):
+				F_mn = 0
+				param_m = self.fisher_params[m]
+				param_n = self.fisher_params[n]
+				
+				for ll in range(28):
+					#vec_m = np.zeros(4)
+					#vec_n = np.zeros(4)
+					#inv_cov = np.zeros([4,4])
+					
+					vec_m = self.deriv_vec[param_m]["TT"][ll]
+					vec_n = self.deriv_vec[param_n]["TT"][ll]
+					"""
+					for i in range(4):
+						for j in range(4):
+							if i == 0:
+								vec_m[i] = self.deriv_vec[param_m]["TT"][ll]
+							elif i == 1:
+								vec_m[i] = self.deriv_vec[param_m]["TE"][ll]
+							elif i == 2:
+								vec_m[i] = self.deriv_vec[param_m]["EE"][ll]
+							elif i == 3:
+								vec_m[i] = self.deriv_vec[param_m]["dd"][ll]
+							
+							if j == 0:
+								vec_n[j] = self.deriv_vec[param_n]["TT"][ll]
+							elif j == 1:
+								vec_n[j] = self.deriv_vec[param_n]["TE"][ll]
+							elif j == 2:
+								vec_n[j] = self.deriv_vec[param_n]["EE"][ll]
+							elif j == 3:
+								vec_n[j] = self.deriv_vec[param_n]["dd"][ll]
+							
+							inv_cov[i,j] = self.cov["{0}{1}".format(i+1,j+1)][ll]
+					"""
+					inv_cov = self.cov["{0}{1}".format(1,1)][ll]/2.	
+					inv_cov = 1/inv_cov
+					F_mn += vec_m*inv_cov*vec_n
+				F[m,n] = F_mn
+		return F	
+	
 
 
 
