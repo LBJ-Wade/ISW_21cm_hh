@@ -262,7 +262,7 @@ class cl_21 (object):
 				#dlogAB_dlogTM = dv.derivative (TM[::-1], dlogAB_dlogTM[::-1])[::-1]
 				dlogAB_dlogTm = dv.derivative ([np.log(Tm[i-1]), np.log(Tm[i]), np.log(Tm[i+1])][::-1], dlogAB_dlogTm[::-1])[::-1]
 	
-				ddelta_Tm_dz = -1./(hubble[i]*(1.+new_z[i])) * ( gamma[i]*( (Tr[i]-Tm[i])/Tm[i]*delta_x_ini*0 - Tr[i]/Tm[i]*delta_Tm_ini) + 2./3.*(1.+new_z[i])*b_dot[i])
+				ddelta_Tm_dz = -1./(hubble[i]*(1.+new_z[i])) * ( gamma[i]*( (Tr[i]-Tm[i])/Tm[i]*delta_x_ini - Tr[i]/Tm[i]*delta_Tm_ini) + 2./3.*(1.+new_z[i])*b_dot[i])
 				delta_Tm_ini -= ddelta_Tm_dz*dz
 				delta_Tm.append (delta_Tm_ini)
 
