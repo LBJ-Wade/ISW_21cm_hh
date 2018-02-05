@@ -13,7 +13,7 @@ import derivative as dv
 def set_cl_21 (tag, Yp_BBN):		# At the end, it would take z_m_list, w_list as arguments
 	""" Construct object of class cl_21 """
 	
-	infile = 'data/file_names_{0}.txt'.format (tag)
+	infile = path_data + '/file_names_{0}.txt'.format (tag)
 	file_names = np.genfromtxt(infile, dtype="str")[0:]
 	params_input = file_names[0]
 	infile_syn = file_names[1]
@@ -196,6 +196,11 @@ class cl_21 (object):
 		Tm *= self.k_B
 		Tm_Tr = Tm/Tr
 		
+		#plt.figure(10)
+		#plt.loglog (new_z+1,(Tr-Tm)/Tm)
+		#plt.title (r'$(T_r-T_m)/T_m$')
+		#plt.savefig ('tr-tm_tm.pdf')
+
 		hubble = hubble * self.c / self.Mpc_to_m
 		hubble_class = hubble_class *self.c / self.Mpc_to_m
 
@@ -234,7 +239,8 @@ class cl_21 (object):
 		T_b = np.interp(zz[::-1], self.z_HYREC[::-1], self.T_b[::-1])[::-1]
 			
 		#for i in [self.number_of_k2-1]:
-		for i in range(self.number_of_k2):
+		#for i in range(self.number_of_k2):
+		for i in [0,100,200,300,400,500,600,700]:
 			kk = self.klist2[::-1][i]
 			print (i, kk)
 			b = self.baryon[i*self.number_of_z2:(i+1)*self.number_of_z2]
@@ -269,7 +275,7 @@ class cl_21 (object):
 				ddelta_x_dz = -1./(hubble[i]*(1.+new_z[i]))*x_dot[i]/x[i] * (delta_x_ini + b[i] + dlogAB_dlogTm[1] * delta_Tm_ini + dlogC_dlogRLya[i]*(theta_b[i]/(3.*hubble[i])-b[i]))
 				delta_x_ini -= ddelta_x_dz*dz
 				delta_x.append (delta_x_ini)
-			
+				print (delta_x_ini, b[i], dlogAB_dlogTm[1], dlogC_dlogRLya[i]*(theta_b[i]/(3.*hubble[i])-b[i]))
 			#plt.figure(1)
 			#fig = plt.subplot(1,1,1)
 			#plt.xscale('log', basex=2)
@@ -280,7 +286,13 @@ class cl_21 (object):
 			#fig.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
 			#plt.legend ()
 			#plt.show()
-
+			new_delta_x = -np.array(delta_x)
+			#plt.figure(1)
+			#plt.loglog (new_z+1, new_delta_x, label = '{}'.format(kk))
+			#plt.figure(2)
+			#plt.loglog (new_z+1, delta_Tm, label = '{}'.format(kk))
+			#plt.figure(3)
+			#plt.loglog (new_z+1, b, label = '{}'.format(kk))
 			delta_Tm = np.interp(zz[::-1], new_z[::-1], delta_Tm[::-1])[::-1]
 
 			transfer_21 = T_H 
@@ -291,6 +303,20 @@ class cl_21 (object):
 			redshift_distortion += list(distortion)
 			redshift += list(zz)
 			wavenumber += list(np.ones(len(zz))*kk)
+		plt.figure (1)
+		plt.title (r'$-\delta_{x_e}$')
+		plt.legend (prop={'size':10})
+		plt.savefig ('delta_x_e.pdf')
+		plt.figure (2)
+		plt.title (r'$\delta_{T_m}$')
+		plt.legend (prop={'size':10})
+		plt.axis([1,10000,10**-8,10**5])
+		plt.savefig('T_m.pdf')
+		plt.figure (3)
+		plt.legend (prop={'size':10})
+		plt.title (r'$\delta_b$')
+		plt.savefig('b.pdf')
+		
 		self.T21 = np.array (T21)
 		self.T21_2 = np.array (T21_2)
 		self.redshift_distortion = np.array (redshift_distortion)
@@ -300,7 +326,7 @@ class cl_21 (object):
 	
 		data = np.column_stack (( self.zlist, self.T21, self.T21_2 ))
 		np.savetxt('transfer_21.txt', data, fmt = '%1.6e')
-
+		
 
 	def cl21T (self, z_m, w):
 		""" Calculate cross-correlation functions of ISW and 21 cm """
